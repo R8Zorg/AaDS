@@ -1,4 +1,4 @@
-def f(a: list):
+def f(a):
     s, sp, fl = 0, 0, 0
     i = 0
     while i < len(a):
