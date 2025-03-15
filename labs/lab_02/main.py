@@ -16,7 +16,8 @@ digit_dict = {
 
 with open("input.txt", "r") as file:
     file_data = file.read()
-    numbers = re.findall(r"\b(77|[0-7]77|[0-3][0-7]77)\b", file_data)
+    # numbers = re.findall(r"\b[0-3]?[0-7]{1}77\b", file_data)  # 77 не учитывается
+    numbers = re.findall(r"\b[0-3]?[0-7]?77\b", file_data)  # 77 учитывается
     for number in numbers:
         words = []
         for letter in number:
