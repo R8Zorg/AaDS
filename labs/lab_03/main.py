@@ -9,13 +9,22 @@
 
 n = 5
 
-a = [
-    [1, 2, 3, 4, 5],
-    [1, 1, 3, 4, 5],
-    [2, 2, 1, 4, 5],
-    [1, 2, 3, 0, 5],
-    [1, 2, 3, 4, 0],
+a1 = [
+    [9, 2, 2, 2, 9],
+    [-9, 9, 2, 9, 3],
+    [0, 0, 9, 3, 3],
+    [0, 9, 4, 9, 3],
+    [9, -9, 4, 4, 9],
 ]
+
+a = [
+    [0, 2, 2, 2, 0],
+    [9, 0, 2, 0, 3],
+    [1, 1, 0, 3, 3],
+    [1, 0, 4, 0, 3],
+    [0, 4, 4, 4, 0],
+]
+
 
 def print_matrix(m):
     for i in range(len(m)):
@@ -52,18 +61,16 @@ for i in range(1, n // 2):
 
 print(f"Sum: {summ}\nMult: {mult}")
 if summ > mult:
-    print("sum > mult")
-    for i in range(n):
-        flag = False
-        for j in range(n):
-            if i + j == n - 1:
-                break
-            if flag:
-                f[i][j], f[j][i] = f[j][i], f[i][j]
-            if i == j:
-                flag = True
+    print("sum > mult. Перестановка симметрично 1 и 2 частей.")
+    for i in range(n // 2):
+        for j in range(i):
+            f[i][j], f[j][i] = f[j][i], f[i][j]
+    for i in range(n // 2, n):
+        for j in range(n - (i + 1)):
+            f[i][j], f[j][i] = f[j][i], f[i][j]
+
 else:
-    print("sum < mult")
+    print("sum < mult. Перестановка несимметрично 3 и 4 частей.")
     for i in range(1, n // 2):
         for j in range(n - i, n):
             f[i][j], f[j][j - i + (n - j - 1)] = f[j][j - i + (n - j - 1)], f[i][j]
