@@ -22,6 +22,6 @@ def f_iter(n):
     return num_1
 
 
-n = 5
+n = 29  # 29 max
 print(f"1: {f_rec(n)}")
 print(f"2: {f_iter(n)}")
