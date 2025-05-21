@@ -71,6 +71,6 @@ def detemenite_borders():
             break
 
 
-n = 2000
+n = 30
 comparing(n)
 detemenite_borders()
