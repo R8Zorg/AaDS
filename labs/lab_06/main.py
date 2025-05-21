@@ -1,4 +1,5 @@
 import math
+import time
 
 
 def f_rec(n):
@@ -22,6 +23,54 @@ def f_iter(n):
     return num_1
 
 
-n = 29  # 29 max
-print(f"1: {f_rec(n)}")
-print(f"2: {f_iter(n)}")
+def func_measure_time(func, n):
+    start_time = time.perf_counter()
+    result = func(n)
+    end_time = time.perf_counter()
+    return end_time - start_time, result
+
+
+def comparing(max_n):
+    print("n\tВремя рекурсивного алгоритма\tВремя итерационного алгоритма")
+    print("---------------------------------------------------------------------")
+
+    for n in range(1, max_n + 1):
+        try:
+            rec_time, rec_value = func_measure_time(f_rec, n)
+            iter_time, iter_value = func_measure_time(f_iter, n)
+
+            print(f"{n}\t{rec_time * 1000:.6f}\t\t\t{iter_time * 1000:.6f}")
+        except RecursionError:
+            print(f"{n}\tГлубина рекурсии превышена\t{iter_time * 1000:.6f}")
+            continue
+
+        except Exception as e:
+            print(f"{n}\tОшибка: {str(e)}")
+            break
+
+
+def detemenite_borders():
+    print("\nОпределение границ применимости алгоритмов:")
+
+    max_rec_n = 0
+    for n in range(1, 1000):
+        try:
+            f_rec(n)
+            max_rec_n = n
+        except Exception:
+            print(f"Рекурсивный алгоритм: максимальное n = {max_rec_n}")
+            break
+
+    max_it_n = 0
+    for n in range(1, 1000):
+        try:
+            f_iter(n)
+            max_it_n = n
+        except Exception:
+            print(f"Итеративный алгоритм: алгоритм: максимальное n = {max_it_n}")
+            break
+
+
+n = 2000
+comparing(n)
+detemenite_borders()
