@@ -5,7 +5,11 @@ import time
 def f_rec(n):
     if n == 1 or n == 2:
         return 1
-    return (-1) ** n * (f_rec(n - 2) * math.factorial(n) / math.factorial(2 * n))
+    if n % 2 == 0:
+        sign = 1
+    else:
+        sign = -1
+    return sign * (f_rec(n - 2) * math.factorial(n) / math.factorial(2 * n))
 
 
 def f_iter(n):
@@ -30,30 +34,36 @@ def func_measure_time(func, n):
     return end_time - start_time, result
 
 
-def comparing(max_n):
+def comparing():
     print("n\tВремя рекурсивного алгоритма\tВремя итерационного алгоритма")
     print("---------------------------------------------------------------------")
 
-    for n in range(1, max_n + 1):
-        try:
-            rec_time, rec_value = func_measure_time(f_rec, n)
-            iter_time, iter_value = func_measure_time(f_iter, n)
+    rec_time, rec_value = 0, 0
+    iter_time, iter_value = 0, 0
+    try:
+        rec_time, rec_value = func_measure_time(f_rec, n)
 
-            print(f"{n}\t{rec_time * 1000:.6f}\t\t\t{iter_time * 1000:.6f}")
-        except RecursionError:
-            print(f"{n}\tГлубина рекурсии превышена\t{iter_time * 1000:.6f}")
-            continue
+    except RecursionError:
+        print(f"{n}\tГлубина рекурсии превышена\t{iter_time * 1000:.6f}")
 
-        except Exception as e:
-            print(f"{n}\tОшибка: {str(e)}")
-            break
+    except Exception as e:
+        print(f"{n}\tОшибка: {str(e)}")
+
+    try:
+        iter_time, iter_value = func_measure_time(f_iter, n)
+
+    except Exception as e:
+        print(f"{n}\tОшибка: {str(e)}")
+
+    print(f"{n}\t{rec_time * 1000:.6f}\t\t\t{iter_time * 1000:.6f}")
 
 
 def detemenite_borders():
     print("\nОпределение границ применимости алгоритмов:")
 
+    big_num = 1000
     max_rec_n = 0
-    for n in range(1, 1000):
+    for n in range(1, big_num):
         try:
             f_rec(n)
             max_rec_n = n
@@ -62,7 +72,7 @@ def detemenite_borders():
             break
 
     max_it_n = 0
-    for n in range(1, 1000):
+    for n in range(1, big_num):
         try:
             f_iter(n)
             max_it_n = n
@@ -71,6 +81,6 @@ def detemenite_borders():
             break
 
 
-n = 30
-comparing(n)
+n = int(input("Введите n: "))
+comparing()
 detemenite_borders()
