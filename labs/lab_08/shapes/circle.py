@@ -1,30 +1,32 @@
-from interfaces.base_circle import BaseShape
+import math
 
 
-class Circle(BaseShape):
-    def __init__(self, color: float, size: float):
-        self.color: float = color
-        self.size: float = size
-        self.x: float = 0
-        self.y: float = 0
+class Circle:
+    def __init__(self, x: int, y: int, r: int, color: str):
+        self._x: int = x
+        self._y: int = y
+        self._r: int = r
+        self._color: str = color
+
+    def get_x(self) -> int:
+        return self._x
+
+    def get_y(self) -> int:
+        return self._y
+
+    def get_r(self) -> int:
+        return self._r
 
     def get_color(self) -> str:
-        return self.color
+        return self._color
 
-    def get_size(self) -> float:
-        """Get radius"""
-        return self.size
+    def get_position(self) -> tuple[int, int]:
+        return self._x, self._y
 
-    def get_position(self) -> tuple[float, float]:
-        return self.x, self.y
+    def set_position(self, x: int, y: int) -> None:
+        self._x = x
+        self._y = y
 
-    def set_color(self, color: str) -> None:
-        self.color = color
-
-    def set_size(self, r: float) -> None:
-        """Set radius"""
-        self.size = r
-
-    def set_position(self, x: float, y: float) -> None:
-        self.x = x
-        self.y = y
+    def contains(self, other: "Circle") -> bool:
+        distance = math.hypot(self.x - other.x, self.y - other.y)
+        return distance + other.r <= self.r

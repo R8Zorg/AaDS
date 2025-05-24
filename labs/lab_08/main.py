@@ -1,8 +1,17 @@
-from shapes.circle import Circle
+import tkinter as tk
+
+from main_window import MainWindow
+
+
+def print_hello():
+    print("Hello!")
 
 
 def main():
-    circle = Circle("red", 1.4)
+    root = tk.Tk()
+    window = MainWindow(root)
+    window.btn_load_data.configure(command=print_hello)
+    root.mainloop()
 
 
 if __name__ == "__main__":
