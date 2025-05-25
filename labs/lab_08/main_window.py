@@ -5,7 +5,7 @@ from shapes.circle import Circle
 
 class MainWindow:
     def __init__(self, root=None):
-        root.geometry("1100x1000")
+        root.geometry("924x730")
         # root.minsize(1, 1)
         # root.maxsize(2545, 1410)
         root.resizable(1, 1)
@@ -16,30 +16,30 @@ class MainWindow:
         self.circle_ids = []
 
         self.btn_load_data = tk.Button(text="Загрузить данные", command=self.load_data)
-        self.btn_load_data.place(relx=0.064, rely=0.055, height=33, width=130)
+        self.btn_load_data.place(relx=0.042, rely=0.086, height=33, width=161)
 
         self.btn_color_red = tk.Button(text="", background="Red")
-        self.btn_color_red.place(relx=0.718, rely=0.055, height=33, width=71)
+        self.btn_color_red.place(relx=0.797, rely=0.084, height=33, width=71)
 
         self.btn_color_blue = tk.Button(text="", background="Blue")
-        self.btn_color_blue.place(relx=0.782, rely=0.055, height=33, width=71)
-
-        self.btn_color_gren = tk.Button(text="", background="Green")
-        self.btn_color_gren.place(relx=0.718, rely=0.088, height=33, width=71)
-
-        self.btn_color_yellow = tk.Button(text="", background="Yellow")
-        self.btn_color_yellow.place(relx=0.782, rely=0.088, height=33, width=71)
+        self.btn_color_blue.place(relx=0.865, rely=0.084, height=33, width=71)
 
         self.btn_color_black = tk.Button(text="", background="Black")
-        self.btn_color_black.place(relx=0.718, rely=0.121, height=33, width=71)
+        self.btn_color_black.place(relx=0.797, rely=0.125, height=33, width=71)
 
         self.btn_color_white = tk.Button(text="", background="White")
-        self.btn_color_white.place(relx=0.782, rely=0.121, height=33, width=71)
+        self.btn_color_white.place(relx=0.865, rely=0.125, height=33, width=71)
+
+        self.btn_color_yellow = tk.Button(text="", background="Yellow")
+        self.btn_color_yellow.place(relx=0.797, rely=0.164, height=33, width=71)
+
+        self.btn_color_green = tk.Button(text="", background="Green")
+        self.btn_color_green.place(relx=0.865, rely=0.164, height=33, width=71)
 
         self.btn_check_entry = tk.Button(
             text="Проверка включения", activebackground="#d9d9d9"
         )
-        self.btn_check_entry.place(relx=0.064, rely=0.121, height=33, width=150)
+        self.btn_check_entry.place(relx=0.043, rely=0.162, height=33, width=161)
 
         self.draw_field = tk.Canvas(
             background="#d2d8d7",
@@ -47,13 +47,19 @@ class MainWindow:
             relief="ridge",
             selectbackground="#d9d9d5",
         )
-        self.draw_field.place(relx=0.046, rely=0.254, relheight=0.731, relwidth=0.885)
+        self.draw_field.place(relx=0.044, rely=0.253, relheight=0.732, relwidth=0.896)
 
-        self.label1 = tk.Label(text="Проверка включения", anchor="w")
-        self.label1.place(relx=0.064, rely=0.221, height=23, width=249)
+        self.lb_check_entry = tk.Label(text="Проверка включения", anchor="w")
+        self.lb_check_entry.place(relx=0.043, rely=0.221, height=19, width=221)
 
-        self.label2 = tk.Label(text="Выбрать цвет")
-        self.label2.place(relx=0.727, rely=0.022, height=23, width=130)
+        self.lb_choose_color = tk.Label(text="Выбрать цвет")
+        self.lb_choose_color.place(relx=0.802, rely=0.044, height=18, width=124)
+
+        self.btn_turn_left = tk.Button(text="Повернуть влево")
+        self.btn_turn_left.place(relx=0.367, rely=0.163, height=33, width=131)
+
+        self.btn_turn_right = tk.Button(text="Повернуть вправо")
+        self.btn_turn_right.place(relx=0.508, rely=0.163, height=33, width=131)
 
     def load_data(self):
         with open("input.txt", "r") as f:
