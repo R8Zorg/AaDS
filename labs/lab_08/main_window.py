@@ -15,29 +15,44 @@ class MainWindow:
         self.circles = []
         self.circle_ids = []
 
-        self.btn_load_data = tk.Button(text="Загрузить данные", command=self.load_data)
+        self.btn_load_data = tk.Button(
+            text="Загрузить данные", command=self.draw_circles
+        )
         self.btn_load_data.place(relx=0.042, rely=0.086, height=33, width=161)
 
-        self.btn_color_red = tk.Button(text="", background="Red")
+        self.btn_color_red = tk.Button(
+            text="", background="Red", activebackground="Red"
+        )
         self.btn_color_red.place(relx=0.797, rely=0.084, height=33, width=71)
 
-        self.btn_color_blue = tk.Button(text="", background="Blue")
+        self.btn_color_blue = tk.Button(
+            text="", background="Blue", activebackground="Blue"
+        )
         self.btn_color_blue.place(relx=0.865, rely=0.084, height=33, width=71)
 
-        self.btn_color_black = tk.Button(text="", background="Black")
+        self.btn_color_black = tk.Button(
+            text="", background="Black", activebackground="Black"
+        )
         self.btn_color_black.place(relx=0.797, rely=0.125, height=33, width=71)
 
-        self.btn_color_white = tk.Button(text="", background="White")
+        self.btn_color_white = tk.Button(
+            text="", background="White", activebackground="White"
+        )
         self.btn_color_white.place(relx=0.865, rely=0.125, height=33, width=71)
 
-        self.btn_color_yellow = tk.Button(text="", background="Yellow")
+        self.btn_color_yellow = tk.Button(
+            text="", background="Yellow", activebackground="Yellow"
+        )
         self.btn_color_yellow.place(relx=0.797, rely=0.164, height=33, width=71)
 
-        self.btn_color_green = tk.Button(text="", background="Green")
+        self.btn_color_green = tk.Button(
+            text="", background="Green", activebackground="Green"
+        )
         self.btn_color_green.place(relx=0.865, rely=0.164, height=33, width=71)
 
         self.btn_check_entry = tk.Button(
-            text="Проверка включения", activebackground="#d9d9d9"
+            text="Проверка включения",
+            command=self.check_circles,
         )
         self.btn_check_entry.place(relx=0.043, rely=0.162, height=33, width=161)
 
@@ -61,9 +76,20 @@ class MainWindow:
         self.btn_turn_right = tk.Button(text="Повернуть вправо")
         self.btn_turn_right.place(relx=0.508, rely=0.163, height=33, width=131)
 
+    def check_circles(self):
+        if len(self.circles) != 2:
+            tk.messagebox.showerror("Ошибка проверки", "Кругов на поле должно быть 2")
+            return
+        is_include = Circle.contains(self.circles[0], self.circles[1])
+        if is_include:
+            self.lb_check_entry.configure(text="Найдено вхождение кругов", foreground="Green")
+        else:
+            self.lb_check_entry.configure(text="Вхождение не найдено", foreground="Red")
+
     def load_data(self):
+        circles_num = 2
+        self.circles = []
         with open("input.txt", "r") as f:
-            circles_num = 2
             lines = f.readlines()[:circles_num]
             for line in lines:
                 try:
@@ -73,8 +99,7 @@ class MainWindow:
                     tk.messagebox.showerror(
                         "Ошибка чтения данных", "Ожидаемый ввод: int int int str"
                     )
-                    self.root.destroy()
-        self.draw_circles()
+                    return
 
     def get_coordinates(self, circle: "Circle") -> tuple[int, int, int, int]:
         x1 = circle.get_x() - circle.get_r()
@@ -84,6 +109,7 @@ class MainWindow:
         return x1, y1, x2, y2
 
     def draw_circles(self):
+        self.load_data()
         for circle in self.circles:
             cid = self.draw_field.create_oval(
                 self.get_coordinates(circle), outline=circle.get_color()

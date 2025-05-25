@@ -27,6 +27,17 @@ class Circle:
         self._x = x
         self._y = y
 
-    def contains(self, other: "Circle") -> bool:
-        distance = math.hypot(self.x - other.x, self.y - other.y)
-        return distance + other.r <= self.r
+    @staticmethod
+    def contains(circle1: "Circle", circle2: "Circle") -> bool:
+        dist = math.hypot(
+            circle1.get_x() - circle2.get_x(), circle1.get_y() - circle2.get_y()
+        )
+
+        r1 = circle1.get_r()
+        r2 = circle2.get_r()
+        if dist + min(r1, r2) <= max(r1, r2):
+            return True
+        elif dist <= r1 + r2:
+            return True
+        else:
+            return False
