@@ -20,6 +20,9 @@ class Circle:
     def get_color(self) -> str:
         return self._color
 
+    def set_color(self, color: str):
+        self._color = color
+
     def get_position(self) -> tuple[int, int]:
         return self._x, self._y
 
