@@ -63,15 +63,29 @@ class MainWindow:
 
     def load_data(self):
         with open("input.txt", "r") as f:
-            for line in f:
-                x, y, r, color = map(float, line.strip().split())
-                self.circles.append(Circle(x, y, r, color))
+            circles_num = 2
+            lines = f.readlines()[:circles_num]
+            for line in lines:
+                try:
+                    x, y, r, color = line.split()
+                    self.circles.append(Circle(int(x), int(y), int(r), color))
+                except ValueError:
+                    tk.messagebox.showerror(
+                        "Ошибка чтения данных", "Ожидаемый ввод: int int int str"
+                    )
+                    self.root.destroy()
+        self.draw_circles()
+
+    def get_coordinates(self, circle: "Circle") -> tuple[int, int, int, int]:
+        x1 = circle.get_x() - circle.get_r()
+        y1 = circle.get_y() - circle.get_r()
+        x2 = circle.get_x() + circle.get_r()
+        y2 = circle.get_y() + circle.get_r()
+        return x1, y1, x2, y2
 
     def draw_circles(self):
         for circle in self.circles:
-            x0 = circle.get_x() - circle.get_r()
-            y0 = circle.get_y() - circle.get_r()
-            x1 = circle.get_x() + circle.get_r()
-            y1 = circle.get_y() + circle.get_r()
-            cid = self.draw_field.create_oval(x0, y0, x1, y1, outline="blue")
+            cid = self.draw_field.create_oval(
+                self.get_coordinates(circle), outline=circle.get_color()
+            )
             self.circle_ids.append(cid)

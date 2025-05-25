@@ -5,7 +5,7 @@ from main_window import MainWindow
 
 def main():
     root = tk.Tk()
-    window = MainWindow(root)
+    MainWindow(root)
     root.mainloop()
 
 
