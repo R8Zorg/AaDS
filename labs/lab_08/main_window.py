@@ -151,7 +151,7 @@ class MainWindow:
     def draw_circles(self):
         for circle in self.circles:
             cid = self.draw_field.create_oval(
-                self.get_coordinates(circle), outline=circle.get_color()
+                self.get_coordinates(circle), outline=circle.get_color(), width=5
             )
             self.circle_ids.append(cid)
 
