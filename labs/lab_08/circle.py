@@ -2,11 +2,12 @@ import math
 
 
 class Circle:
-    def __init__(self, x: int, y: int, r: int, color: str):
+    def __init__(self, x: int, y: int, r: int, color: str, id):
         self._x: int = x
         self._y: int = y
         self._r: int = r
         self._color: str = color
+        self._id = id
 
     def get_x(self) -> int:
         return self._x
@@ -29,6 +30,12 @@ class Circle:
     def set_position(self, x: int, y: int) -> None:
         self._x = x
         self._y = y
+
+    def get_id(self):
+        return self._id
+
+    def set_id(self, id):
+        self._id = id
 
     @staticmethod
     def contains(circle1: "Circle", circle2: "Circle") -> bool:
