@@ -1,6 +1,7 @@
 import math
 import tkinter as tk
 from functools import partial
+from tkinter import messagebox
 from typing import Literal
 
 from circle import Circle
@@ -132,7 +133,9 @@ class MainWindow:
 
     def check_circles(self) -> None:
         if len(self.circles) != 2:
-            tk.messagebox.showerror("Ошибка проверки", "Кругов на поле должно быть 2")
+            messagebox.showerror(
+                "Ошибка проверки", "Ошибка проверки.\nКругов на поле должно быть 2"
+            )
             return
         is_include = Circle.contains(
             self.circles[self.first_circle_id], self.circles[self.second_circle_id]
@@ -160,8 +163,9 @@ class MainWindow:
                         int(x), int(y), int(r), color, circle_id
                     )
                 except ValueError:
-                    tk.messagebox.showerror(
-                        "Ошибка чтения данных", "Ожидаемый ввод: int int int str"
+                    messagebox.showerror(
+                        "Ошибка чтения данных",
+                        "Ошибка чтения данных.\nОжидаемый ввод: int int int str",
                     )
                     return
         self.update_ids()
