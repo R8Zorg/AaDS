@@ -201,8 +201,11 @@ class MainWindow:
         )
         self.user_point = Circle(x, y, user_point_r, color, circle_id)
 
-    def move_user_point(self, event: tk.Event) -> None:
-        self.user_point.set_position(event.x, event.y)
+    def move_user_point(self, event: tk.Event) -> None:  # type: ignore[type-arg]
+        try:
+            self.user_point.set_position(event.x, event.y)
+        except AttributeError:
+            return
         self.move_to(
             event.x,
             event.y,
