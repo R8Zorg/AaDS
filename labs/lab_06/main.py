@@ -17,8 +17,12 @@ def f_iter(n):
         return 1
 
     num_2, num_1 = 1, 1  # n - 2, n - 1
+
+    if n % 2 == 0:
+        sign = 1
+    else:
+        sign = -1
     for i in range(3, n + 1):
-        sign = (-1) ** i
         numerator = num_2 * math.factorial(i)
         denominator = math.factorial(2 * i)
         current = sign * numerator / denominator
