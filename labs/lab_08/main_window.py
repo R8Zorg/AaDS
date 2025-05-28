@@ -73,10 +73,10 @@ class MainWindow:
         self.entry_turn_degree = tk.Entry()
         self.entry_turn_degree.place(relx=0.478, rely=0.164, height=25, relwidth=0.06)
 
-    def load_and_draw_circles(self):
+    def load_and_draw_circles(self) -> None:
         try:
             self.manager.load_circles_from_file()
-            self.selected_circle_id.set(self.manager.first_circle_id)
+            self.selected_circle_id.set(self.manager.first_circle_id)  # type: ignore
 
             self.rb_first_circle.configure(value=self.manager.first_circle_id)
             self.rb_second_circle.configure(value=self.manager.second_circle_id)
@@ -84,14 +84,14 @@ class MainWindow:
         except Exception as e:
             messagebox.showerror("Ошибка загрузки", str(e))
 
-    def check_circles(self):
+    def check_circles(self) -> None:
         result = self.manager.check_inclusion()
         self.lb_check_entry.configure(
             text="Вхождение найдено" if result else "Вхождение не найдено",
             foreground="Green" if result else "Red",
         )
 
-    def rotate_circle(self, sign: int):
+    def rotate_circle(self, sign: int) -> None:
         try:
             degree = int(self.entry_turn_degree.get()) * sign
         except ValueError:
@@ -104,19 +104,19 @@ class MainWindow:
         center = (user_point.get_x(), user_point.get_y())
         self.manager.rotate_circle(self.selected_circle_id.get(), degree, center)
 
-    def rotate_left(self):
+    def rotate_left(self) -> None:
         self.rotate_circle(1)
 
-    def rotate_right(self):
+    def rotate_right(self) -> None:
         self.rotate_circle(-1)
 
-    def move_user_point(self, event: tk.Event):  # type: ignore
+    def move_user_point(self, event: tk.Event) -> None:  # type: ignore[type-arg]
         user_point = self.canvas.user_point
         if user_point:
             user_point.set_position(event.x, event.y)
             self.canvas.move_circle(user_point)
 
-    def paint_circle(self, color: str):
+    def paint_circle(self, color: str) -> None:
         circle_id = self.selected_circle_id.get()
         if circle_id in self.canvas.circles:
             circle = self.canvas.circles[circle_id]

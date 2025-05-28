@@ -1,9 +1,15 @@
 import tkinter as tk
 from functools import partial
+from typing import Callable
 
 
 class ColorButtons:
-    def __init__(self, root: tk.Tk, colors: list[str], command: callable):
+    def __init__(
+        self,
+        root: tk.Tk,
+        colors: list[str],
+        command: Callable,  # type: ignore[type-arg]
+    ):
         self.buttons = []
         for i, color in enumerate(colors):
             btn = tk.Button(

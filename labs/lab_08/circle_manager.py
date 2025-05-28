@@ -7,11 +7,11 @@ from circle_canvas import CircleCanvas
 class CircleManager:
     def __init__(self, canvas: CircleCanvas):
         self.canvas = canvas
-        self.first_circle_id = None
-        self.second_circle_id = None
+        self.first_circle_id: int | None = None
+        self.second_circle_id: int | None = None
 
-    def load_circles_from_file(self, path="input.txt", counts=2) -> None:
-        self.canvas.clear_canvas()  # canvas.delete("all")
+    def load_circles_from_file(self, path: str = "input.txt", counts: int = 2) -> None:
+        self.canvas.clear_canvas()
         self.canvas.draw_user_point()
         with open(path, "r") as f:
             for i, line in enumerate(f.readlines()[:counts]):
@@ -26,11 +26,13 @@ class CircleManager:
     def check_inclusion(self) -> bool:
         if not self.first_circle_id and not self.second_circle_id:
             return False
-        first_circle = self.canvas.circles[self.first_circle_id]
-        second_circle = self.canvas.circles[self.second_circle_id]
+        first_circle = self.canvas.circles[self.first_circle_id]  # type: ignore
+        second_circle = self.canvas.circles[self.second_circle_id]  # type: ignore
         return Circle.contains(first_circle, second_circle)
 
-    def rotate_circle(self, circle_id: int, angle_degree: int, center: tuple[int, int]):
+    def rotate_circle(
+        self, circle_id: int, angle_degree: int, center: tuple[int, int]
+    ) -> None:
         circle = self.canvas.circles[circle_id]
         center_x, center_y = center
         dx = circle.get_x() - center_x
