@@ -2,7 +2,7 @@ import math
 
 
 class Circle:
-    def __init__(self, x: int, y: int, r: int, color: str, id):
+    def __init__(self, x: int, y: int, r: int, color: str, id: int):
         self._x: int = x
         self._y: int = y
         self._r: int = r
@@ -21,7 +21,7 @@ class Circle:
     def get_color(self) -> str:
         return self._color
 
-    def set_color(self, color: str):
+    def set_color(self, color: str) -> None:
         self._color = color
 
     def get_position(self) -> tuple[int, int]:
@@ -31,17 +31,15 @@ class Circle:
         self._x = x
         self._y = y
 
-    def get_id(self):
+    def get_id(self) -> int:
         return self._id
 
-    def set_id(self, id):
+    def set_id(self, id: int) -> None:
         self._id = id
 
     @staticmethod
     def contains(circle1: "Circle", circle2: "Circle") -> bool:
-        dist = math.hypot(
-            circle1.get_x() - circle2.get_x(), circle1.get_y() - circle2.get_y()
-        )
+        dist = math.hypot(circle1.get_x() - circle2.get_x(), circle1.get_y() - circle2.get_y())
 
         r1 = circle1.get_r()
         r2 = circle2.get_r()

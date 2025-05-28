@@ -3,7 +3,7 @@ import tkinter as tk
 from main_window import MainWindow
 
 
-def main():
+def main() -> None:
     root = tk.Tk()
     MainWindow(root)
     root.mainloop()
