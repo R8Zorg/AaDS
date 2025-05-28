@@ -6,7 +6,6 @@ from typing import Literal
 from circle import Circle
 
 
-# TODO: исправить circle_ids на circles[id: Circle]
 class MainWindow:
     def __init__(self, root: tk.Tk):
         root.geometry("924x730")
