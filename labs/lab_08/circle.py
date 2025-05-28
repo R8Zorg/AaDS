@@ -39,7 +39,9 @@ class Circle:
 
     @staticmethod
     def contains(circle1: "Circle", circle2: "Circle") -> bool:
-        dist = math.hypot(circle1.get_x() - circle2.get_x(), circle1.get_y() - circle2.get_y())
+        dist = math.hypot(
+            circle1.get_x() - circle2.get_x(), circle1.get_y() - circle2.get_y()
+        )
 
         r1 = circle1.get_r()
         r2 = circle2.get_r()
