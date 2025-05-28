@@ -43,9 +43,9 @@ class Circle:
 
         r1 = circle1.get_r()
         r2 = circle2.get_r()
-        if dist + min(r1, r2) <= max(r1, r2):
+        if dist + min(r1, r2) <= max(r1, r2):  # True, если полностью входит
             return True
-        elif dist <= r1 + r2:
+        elif dist <= r1 + r2:  # True, если касается
             return True
         else:
             return False
