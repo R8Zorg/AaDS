@@ -112,9 +112,10 @@ class MainWindow:
 
     def move_user_point(self, event: tk.Event) -> None:  # type: ignore[type-arg]
         user_point = self.canvas.user_point
-        if user_point:
-            user_point.set_position(event.x, event.y)
-            self.canvas.move_circle(user_point)
+        if not user_point:
+            return
+        user_point.set_position(event.x, event.y)
+        self.canvas.move_circle(user_point)
 
     def paint_circle(self, color: str) -> None:
         circle_id = self.selected_circle_id.get()
