@@ -119,7 +119,8 @@ class MainWindow:
 
     def paint_circle(self, color: str) -> None:
         circle_id = self.selected_circle_id.get()
-        if circle_id in self.canvas.circles:
-            circle = self.canvas.circles[circle_id]
-            circle.set_color(color)
-            self.canvas.update_color(circle)
+        if circle_id not in self.canvas.circles:
+            return
+        circle = self.canvas.circles[circle_id]
+        circle.set_color(color)
+        self.canvas.update_color(circle)
