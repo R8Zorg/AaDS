@@ -1,6 +1,5 @@
-from tkinter import StringVar, N, W, E, S, Tk
 import tkinter.scrolledtext as st
-from tkinter import ttk
+from tkinter import StringVar, Tk, ttk
 
 dict_values = {
     "и": 1,
@@ -42,36 +41,47 @@ def get_unique_permutations(word, _best_perm="", _best_perm_value=0):
 
 def get_permutation_data(*args):
     word_value = word.get()
-    if not all(letter in dict_values for letter in word_value):
+    if not all(letter in dict_values for letter in word_value) or word_value == "":
+        lb_best_perm_value.configure(foreground="Red")
         best_perm.set("Введены недопустипые символы")
+        st_permutations.delete(1.0, "end")
         return
     result, best, _ = get_unique_permutations(word_value)
-    best_perm.set(f"Лучшая перестановка: {best}")
-    permutations.delete(1.0, "end")
-    permutations.insert("end", "\n".join(result))
+    lb_best_perm_value.configure(foreground="Green")
+    best_perm.set(best)
+    st_permutations.delete(1.0, "end")
+    st_permutations.insert("end", "\n".join(result))
 
 
 root = Tk()
 root.title("Перестановка")
 
 
-frame = ttk.Frame(root, padding="3 3 12 12")
-frame.grid(column=0, row=0, sticky=(N, W, E, S))
-
 word = StringVar()
-text_entry = ttk.Entry(frame, width=7, textvariable=word)
-text_entry.grid(column=2, row=1, sticky=(W, E))
+best_perm = StringVar(value="Нет")
 
-best_perm = StringVar()
-ttk.Label(frame, textvariable=best_perm).grid(column=1, row=2, sticky=(W, E))
+root.geometry("252x359")
+root.resizable(False, False)
+lb_input_value = ttk.Label(text="Введите последовательность:", anchor="center")
+lb_input_value.place(relx=0.04, rely=0.028, height=30, width=234)
 
-ttk.Button(frame, text="Начать", command=get_permutation_data).grid(column=3, row=1)
-permutations: st.ScrolledText = st.ScrolledText(frame, width=30, height=10)
-permutations.grid(column=1, row=1)
-for child in frame.winfo_children():
-    child.grid_configure(padx=5, pady=5)
+lb_all_combinations = ttk.Label(text="Все последовательности:", anchor="center")
+lb_all_combinations.place(relx=0.04, rely=0.279, height=30, width=236)
 
-text_entry.focus()
+entry_input_value = ttk.Entry(textvariable=word)
+entry_input_value.place(relx=0.04, rely=0.139, height=25, relwidth=0.54)
+entry_input_value.focus()
 root.bind("<Return>", get_permutation_data)
+
+btn_compute = ttk.Button(text="Вычислить", command=get_permutation_data)
+btn_compute.place(relx=0.591, rely=0.125, height=33, width=81)
+
+st_permutations = st.ScrolledText()
+st_permutations.place(relx=0.04, rely=0.362, relheight=0.418, relwidth=0.937)
+
+lb_best_perm = ttk.Label(text="Лучшая перестановка:", anchor="center")
+lb_best_perm.place(relx=0.04, rely=0.808, height=33, width=236)
+lb_best_perm_value = ttk.Label(textvariable=best_perm, anchor="center")
+lb_best_perm_value.place(relx=0.04, rely=0.891, height=22, width=236)
 
 root.mainloop()
