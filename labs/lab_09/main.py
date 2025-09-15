@@ -77,7 +77,7 @@ class TickTacToe:
         if self.is_draw():
             self.end_game("Ничья!")
 
-    def minimax(self, is_maximizing):
+    def minimax(self, is_bot_turn):
         if self.check_winner("O"):
             return 1
         if self.check_winner("X"):
@@ -85,7 +85,7 @@ class TickTacToe:
         if self.is_draw():
             return 0
 
-        if is_maximizing:
+        if is_bot_turn:
             best_score = -math.inf
             for row in range(self.GRID_SIZE):
                 for col in range(self.GRID_SIZE):
