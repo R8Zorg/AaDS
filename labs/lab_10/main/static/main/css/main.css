@@ -59,7 +59,6 @@ body {
     transform: scale(1.05);
 }
 
-/* Чтобы контент не был скрыт под fixed-панелью */
 main {
     padding-top: 80px;
 }

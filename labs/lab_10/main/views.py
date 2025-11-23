@@ -8,3 +8,7 @@ def index(request: HttpRequest) -> HttpResponse:
 
 def about(request: HttpRequest) -> HttpResponse:
     return render(request, "main/about.html")
+
+
+def contacts(request: HttpRequest) -> HttpResponse:
+    return render(request, "main/contacts.html")
