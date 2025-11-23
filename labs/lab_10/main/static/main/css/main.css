@@ -1,0 +1,74 @@
+body {
+    background: #2c2c2c;
+}
+
+.topnav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 64px;
+    background: #1e1e1e;
+    color: #fff;
+    z-index: 9999;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.nav-inner {
+    position: relative;
+    height: 100%;
+    padding: 0 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: left;
+}
+
+.nav-inner img {
+    height: 50px;
+}
+
+
+.nav-items {
+    position: absolute;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 60px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+}
+
+.nav-items li {
+    transition: transform .4s ease;
+}
+
+.topnav a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 500;
+}
+
+.topnav ul li:hover,
+.topnav ul a:hover {
+    color: #eb5959;
+    text-decoration: none;
+    transform: scale(1.05);
+}
+
+/* Чтобы контент не был скрыт под fixed-панелью */
+main {
+    padding-top: 80px;
+}
+
+main .fetures {
+    float: left;
+    color: #fff;
+    margin-top: 100px;
+    text-align: center;
+    width: 75%;
+
+}
