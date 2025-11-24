@@ -4,28 +4,30 @@
 {% block content %}
     <div class="features">
         <h1>{{ header }}</h1>
-        <p>
-            Я студент-программист, которому ближе всего backend и работа с серверной частью.
-            У меня есть знания в администрировании, а frontend я откровенно не люблю — вёрстка точно не моё.
-        </p>
-        <p>
-            Пишу на Python, Java и C#, работаю в NeoVim, использую PostgreSQL,
-            а также создаю CRM-решения на C# и Java. Умею обеспечивать базовую защиту Linux-сервера.
-        </p>
-        <p>
-            Среди моих проектов — небольшой python-скрипт для анализа сетевых пакетов через pyshark,
-            desktop-приложения на C#, а также мой собственный фреймворк <strong>JDA-Tools</strong> для работы с JDA (Java Discord API).
-            Я фанат Arch Linux с Hyprland и принимал участие в развитии одной из популярных конфигураций — JaKooLit dotfiles.
-        </p>
-        <p>
-            Мне нравится продумывать архитектуру проектов так, чтобы добавление нового функционала было простым и логичным.
-            Особенно люблю разрабатывать Discord-ботов — приятно видеть, когда созданный инструмент реально помогает людям.
-        </p>
-        <p>
-            В свободное время играю в игры и изучаю, как они устроены “под капотом”:
-            иногда экспериментирую с Cheat Engine, чтобы лучше разобраться в механиках.
-            Это для изучения, не для вреда.
-        </p>
+        <div class="bio-block">
+            <p>
+                Я <span class="highlight">студент-программист</span>, которому ближе всего <span class="highlight">backend</span> и работа с серверной частью.
+                У меня есть знания в <span class="highlight">администрировании</span>, а frontend я откровенно не люблю — вёрстка точно не моё.
+            </p>
+            <p>
+                Пишу на <span class="highlight">Python, Java и C#</span>, работаю в <span class="highlight">NeoVim</span>, использую <span class="highlight">PostgreSQL</span>,
+                а также создаю CRM-решения на C# и Java. Умею обеспечивать базовую <span class="highlight">защиту Linux-сервера</span>.
+            </p>
+            <p>
+                Среди моих проектов — небольшой python-скрипт для анализа сетевых пакетов через pyshark,
+                desktop-приложения на C#, а также мой собственный фреймворк <strong>JDA-Tools</strong> для работы с JDA (Java Discord API).
+                Я фанат <span class="highlight">Arch Linux</span> с <span class="highlight">Hyprland</span> и принимал участие в развитии одной из популярных конфигураций — JaKooLit dotfiles.
+            </p>
+            <p>
+                Мне нравится продумывать архитектуру проектов так, чтобы добавление нового функционала было <span class="highlight">простым и логичным</span>.
+                Особенно люблю разрабатывать <span class="highlight">Discord-ботов</span> — приятно видеть, когда созданный инструмент реально помогает людям.
+            </p>
+            <p>
+                В свободное время играю в игры и изучаю, как они устроены “под капотом”:
+                иногда экспериментирую с <span class="highlight">Cheat Engine</span>, чтобы лучше разобраться в механиках.
+                Это для изучения, не для вреда.
+            </p>
+        </div>
         <button class="btn btn-warning" id="showVideoBtn">Посмотреть видео</button>
         <div id="vid" style="display:none; margin-top: 20px;">
             <video controls width="640">

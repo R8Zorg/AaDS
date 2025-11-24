@@ -27,6 +27,7 @@ body {
     height: 70px;
     margin-top: -5px;
 }
+
 .nav-inner span {
     font-size: 26px;
 }
@@ -66,22 +67,43 @@ main {
     padding-top: 80px;
 }
 
-main .features {
-    float: left;
-    color: #fff;
+
+.features {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    background: #f9f9f9;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.features h1 {
     text-align: center;
-    width: 100%;
-
+    margin-bottom: 30px;
+    font-size: 2.5rem;
+    color: #333;
+    letter-spacing: 1px;
 }
 
-main .features h1 {
-    font-size: 50px;
+.bio-block p {
+    line-height: 1.7;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    color: #555;
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
-main .features p {
-    max-width: 1000px;
-    margin: 20px auto;
+.bio-block p:hover {
+    transform: translateX(5px);
+    box-shadow: inset 3px 0 0 #ffc107;
 }
+
+.highlight {
+    color: #ffc107;
+    font-weight: 600;
+}
+
 .projects-grid {
     display: flex;
     flex-wrap: wrap;
@@ -103,7 +125,7 @@ main .features p {
 
 .project-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 .project-image img {
@@ -115,9 +137,11 @@ main .features p {
 .project-info {
     padding: 10px 15px;
 }
+
 .project-info h3 {
     margin: 0 0 5px 0;
 }
+
 .project-info p {
     margin: 0;
     font-size: 0.9rem;
