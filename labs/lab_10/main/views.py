@@ -3,11 +3,10 @@ from django.shortcuts import render
 
 
 def index(request: HttpRequest) -> HttpResponse:
-    return render(request, "main/index.html")
-
-
-def about(request: HttpRequest) -> HttpResponse:
-    return render(request, "main/about.html")
+    data: dict[str, object] = {
+        "title": "Главная страница",
+    }
+    return render(request, "main/index.html", data)
 
 
 def contacts(request: HttpRequest) -> HttpResponse:
