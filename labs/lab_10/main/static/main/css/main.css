@@ -82,3 +82,44 @@ main .features p {
     max-width: 1000px;
     margin: 20px auto;
 }
+.projects-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 20px;
+    justify-content: center;
+}
+
+.project-card {
+    display: block;
+    width: 300px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.project-image img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+
+.project-info {
+    padding: 10px 15px;
+}
+.project-info h3 {
+    margin: 0 0 5px 0;
+}
+.project-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #999;
+}
