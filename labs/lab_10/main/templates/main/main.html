@@ -1,13 +1,51 @@
 {% extends "main/layout.html" %}
+{% load static %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
     <div class="features">
-        <h1>{{ title }}</h1>
+        <h1>{{ header }}</h1>
         <p>
-            some text some text some text some text some text some text some text some text some text some text some text some text some text some text some text some text some text
+            Я студент-программист, которому ближе всего backend и работа с серверной частью.
+            У меня есть знания в администрировании, а frontend я откровенно не люблю — вёрстка точно не моё.
         </p>
-        <button class="btn btn-warning">DON'T PRESS THE BUTTON</button>
-        {% for el in values %}<p>{{ el }}</p>{% endfor %}
+        <p>
+            Пишу на Python, Java и C#, работаю в NeoVim, использую PostgreSQL,
+            а также создаю CRM-решения на C# и Java. Умею обеспечивать базовую защиту Linux-сервера.
+        </p>
+        <p>
+            Среди моих проектов — небольшой python-скрипт для анализа сетевых пакетов через pyshark,
+            desktop-приложения на C#, а также мой собственный фреймворк <strong>JDA-Tools</strong> для работы с JDA (Java Discord API).
+            Я фанат Arch Linux с Hyprland и принимал участие в развитии одной из популярных конфигураций — JaKooLit dotfiles.
+        </p>
+        <p>
+            Мне нравится продумывать архитектуру проектов так, чтобы добавление нового функционала было простым и логичным.
+            Особенно люблю разрабатывать Discord-ботов — приятно видеть, когда созданный инструмент реально помогает людям.
+        </p>
+        <p>
+            В свободное время играю в игры и изучаю, как они устроены “под капотом”:
+            иногда экспериментирую с Cheat Engine, чтобы лучше разобраться в механиках.
+            Это для изучения, не для вреда.
+        </p>
+        <button class="btn btn-warning" id="showVideoBtn">Посмотреть видео</button>
+        <div id="vid" style="display:none; margin-top: 20px;">
+            <video controls width="640">
+                <source src="{% static 'main/video/video.mp4' %}" type="video/mp4">
+                Твой браузер не поддерживает видео.
+            </video>
+        </div>
+        <script>
+            const btn = document.getElementById("showVideoBtn");
+            const vidBlock = document.getElementById("vid");
 
+            btn.addEventListener("click", function() {
+                if (vidBlock.style.display === "none") {
+                    vidBlock.style.display = "block";
+                    btn.textContent = "Скрыть видео";
+                } else {
+                    vidBlock.style.display = "none";
+                    btn.textContent = "Посмотреть видео";
+                }
+            });
+        </script>
     </div>
 {% endblock %}

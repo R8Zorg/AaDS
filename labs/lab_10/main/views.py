@@ -4,7 +4,8 @@ from django.shortcuts import render
 
 def main(request: HttpRequest) -> HttpResponse:
     data: dict[str, object] = {
-        "title": "Главная страница",
+        "title": "Главная",
+        "header": "Привет! Я — R8Zorg",
     }
     return render(request, "main/main.html", data)
 

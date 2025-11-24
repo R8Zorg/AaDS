@@ -79,6 +79,6 @@ main .features h1 {
 }
 
 main .features p {
-    max-width: 400px;
+    max-width: 1000px;
     margin: 20px auto;
 }
