@@ -29,4 +29,5 @@ graph = {
     "F": ["G"],
     "G": ["F"],
 }
-print(f"Недоступные города: {unreachable_city(graph, 'A')}")
+start_point = "A"
+print(f"Недоступные города из {start_point}: {unreachable_city(graph, start_point)}")
