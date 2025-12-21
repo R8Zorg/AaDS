@@ -162,20 +162,6 @@ class BattleshipGUI:
         )
         btn_auto_pattern.pack(side="left", padx=2)
 
-        self.ready_btn = tk.Button(
-            controls_frame,
-            text="Готов",
-            state="disabled",
-            bg="lightgreen",
-            command=self.on_ready,
-        )
-        self.ready_btn.pack(fill="x", padx=6, pady=(10, 2))
-
-        new_game_btn = tk.Button(
-            controls_frame, text="Новая игра (в меню)", command=self._create_menu
-        )
-        new_game_btn.pack(fill="x", padx=6, pady=2)
-
         bot_frame = tk.LabelFrame(controls_frame, text="Бот")
         bot_frame.pack(padx=6, pady=6, fill="x")
         tk.Label(bot_frame, text="Алгоритм атаки:").pack(anchor="w", padx=4)
@@ -218,7 +204,6 @@ class BattleshipGUI:
         )
         rpb2.pack(anchor="w", padx=6)
 
-        # Boards
         boards_frame = tk.Frame(self.game_frame)
         boards_frame.pack(padx=8, pady=8)
 
@@ -252,12 +237,26 @@ class BattleshipGUI:
             info_frame, text="Информация: размещай корабли.", anchor="w", justify="left"
         )
         self.info_label.pack(fill="x")
+        self.ready_btn = tk.Button(
+            info_frame,
+            text="Готов",
+            state="disabled",
+            command=self.on_ready,
+        )
+        self.ready_btn.pack(fill="x", padx=6, pady=(10, 2))
+        restart_btn = tk.Button(
+            info_frame, text="Перезапустить", command=self._start_game_screen
+        )
+        restart_btn.pack(fill="x", padx=6, pady=2)
+
+        new_game_btn = tk.Button(
+            info_frame, text="В меню", command=self._create_menu
+        )
+        new_game_btn.pack(fill="x", padx=6, pady=2)
 
         self._draw_grid(self.player_canvas)
         self._draw_grid(self.bot_canvas)
         self.update_ui()
-
-        self._bot_place()
 
     def _build_ship_queue(self, ships_spec):
         queue = []
@@ -325,7 +324,7 @@ class BattleshipGUI:
             self.info(f"Поставлен корабль {length}-палубный.")
             self.update_ui()
             if self.current_ship_index >= len(self.current_ship_queue):
-                self.ready_btn.config(state="normal")
+                self.ready_btn.config(state="normal", bg="lightgreen")
                 self.info("Все корабли размещены. Нажми 'Готов' чтобы начать.")
         else:
             self.info("Нельзя разместить корабль в этой позиции.")
@@ -388,9 +387,7 @@ class BattleshipGUI:
 
     def auto_place(self, algo):
         self.player_board.reset()
-        self.current_ship_index = len(
-            self._build_ship_queue(self.ships_spec)
-        )
+        self.current_ship_index = len(self._build_ship_queue(self.ships_spec))
         if algo == "RANDOM":
             ok = auto_place_random_greedy(self.player_board, self.ships_spec)
         else:
@@ -402,7 +399,7 @@ class BattleshipGUI:
             self.current_ship_index = 0
         else:
             self.info("Корабли расставлены автоматически.")
-            self.ready_btn.config(state="normal")
+            self.ready_btn.config(state="normal", bg="lightgreen")
         self.update_ui()
 
     def _bot_place(self):
@@ -421,7 +418,7 @@ class BattleshipGUI:
             )
             return
         self.placing_phase = False
-        self.ready_btn.config(state="disabled")
+        self.ready_btn.config(state="disabled", bg=self.root.cget("bg"))
         self.info("Игра началась! Твой ход — стреляй по полю противника.")
         self.bot_ai.reset()
         self.bot_ai.mode = self.bot_attack_mode
@@ -495,7 +492,7 @@ class BattleshipGUI:
                     ey - 1,
                     fill=color,
                     outline="",
-                    tags=("cell",),
+                    tags=("cell"),
                 )
                 offset = 5
                 if state == CellState.MISS or state == CellState.SUNK:
