@@ -108,10 +108,10 @@ class BattleshipGUI:
         )
         self.turn_indicator.pack(side="left", padx=6)
 
-        controls_frame = tk.Frame(self.game_frame)
-        controls_frame.pack(side="left", anchor="ne", padx=10, pady=10, fill="y")
+        self.controls_frame = tk.Frame(self.game_frame)
+        self.controls_frame.pack(side="left", anchor="ne", padx=10, pady=10, fill="y")
 
-        orient_frame = tk.LabelFrame(controls_frame, text="Ориентация")
+        orient_frame = tk.LabelFrame(self.controls_frame, text="Ориентация")
         orient_frame.pack(padx=6, pady=6, fill="x")
         btn_h = tk.Button(
             orient_frame,
@@ -130,7 +130,7 @@ class BattleshipGUI:
         )
         self.orientation_label.pack(side="left", padx=6)
 
-        place_frame = tk.LabelFrame(controls_frame, text="Размещение")
+        place_frame = tk.LabelFrame(self.controls_frame, text="Размещение")
         place_frame.pack(padx=6, pady=6, fill="x")
         self.next_ship_label = tk.Label(place_frame, text=self._next_ship_text())
         self.next_ship_label.pack(pady=2)
@@ -162,7 +162,7 @@ class BattleshipGUI:
         )
         btn_auto_pattern.pack(side="left", padx=2)
 
-        bot_frame = tk.LabelFrame(controls_frame, text="Бот")
+        bot_frame = tk.LabelFrame(self.controls_frame, text="Бот")
         bot_frame.pack(padx=6, pady=6, fill="x")
         tk.Label(bot_frame, text="Алгоритм атаки:").pack(anchor="w", padx=4)
         var_bot_attack = tk.StringVar(value=self.bot_attack_mode)
@@ -418,6 +418,10 @@ class BattleshipGUI:
             )
             return
         self.placing_phase = False
+
+        self.next_ship_label = None
+        self.orientation_label = None
+        self.controls_frame.destroy()
         self.ready_btn.config(state="disabled", bg=self.root.cget("bg"))
         self.info("Игра началась! Твой ход — стреляй по полю противника.")
         self.bot_ai.reset()
