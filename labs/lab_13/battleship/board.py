@@ -15,7 +15,6 @@ class Board:
             [CellState.EMPTY for _ in range(self.size)] for _ in range(self.size)
         ]
         self.ships: list[Ship] = []
-        # порядок добавления кораблей нужен для "убрать последний"
         self.place_history = []
 
     def in_bounds(self, x, y) -> bool:
@@ -43,13 +42,11 @@ class Board:
             for yi in range(y, y + length):
                 coords.append((x, yi))
 
-        # check overlapping or touching other ships
         for cx, cy in coords:
             if not self.in_bounds(cx, cy):
                 return False
             if self.grid[cy][cx] != CellState.EMPTY:
                 return False
-            # check surrounding 8 neighbors for no-touch
             for dx in (-1, 0, 1):
                 for dy in (-1, 0, 1):
                     nx, ny = cx + dx, cy + dy
@@ -107,13 +104,11 @@ class Board:
             if ship:
                 ship.register_hit(x, y)
                 if ship.is_sunk():
-                    # пометим все клетки корабля как SUNK
                     for cx, cy in ship.cells:
                         self.grid[cy][cx] = CellState.SUNK
                     return CellState.SUNK, ship
                 return CellState.HIT, ship
             return CellState.HIT, None
-        # already HIT / SUNK / MISS
         return None, None
 
     def find_ship_by_cell(self, x: int, y: int) -> Ship | None:

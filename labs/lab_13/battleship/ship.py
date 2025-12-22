@@ -9,8 +9,8 @@ class Ship:
         orientation: Orientation = Orientation.H,
     ) -> None:
         self.length = length
-        self.orientation = orientation  # 'H' (left) или 'V' (down)
-        self.cells = list(cells) if cells else []  # список (x,y)
+        self.orientation = orientation
+        self.cells = list(cells) if cells else []
         self.hits: set[tuple[int, int]] = set()
 
     def occupies(self, x, y) -> bool:

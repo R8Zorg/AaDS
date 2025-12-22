@@ -281,7 +281,6 @@ class BattleshipGUI:
 
     def _draw_grid(self, canvas):
         for i in range(GRID_SIZE + 1):
-            # vertical lines
             canvas.create_line(
                 i * self.cell_px,
                 0,
@@ -289,7 +288,6 @@ class BattleshipGUI:
                 GRID_SIZE * self.cell_px,
                 fill="black",
             )
-            # horizontal lines
             canvas.create_line(
                 0,
                 i * self.cell_px,
