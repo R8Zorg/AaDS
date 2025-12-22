@@ -17,6 +17,7 @@ class BattleshipGUI:
     def __init__(self, root):
         self.root = root
         root.title("Морской бой")
+        root.geometry("1300x600")
         self.menu_frame = None
         self.game_frame = None
 
