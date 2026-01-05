@@ -16,18 +16,15 @@ class GameLogic:
         self.game_over: bool = False
         self.winner: Optional[str] = None
 
-        # Настройки
         self.show_enemy_ships: bool = False
         self.highlight_adjacent: bool = True
         self.bot_placement_algorithm: PlacementAlgorithm = PlacementAlgorithm.RANDOM
         self.bot_attack_algorithm: Optional[AttackAlgorithms] = None
 
-        # Корабли игрока для размещения
         self.player_ships_to_place: List[Ship] = []
         self._init_player_ships()
 
     def _init_player_ships(self) -> None:
-        """Инициализирует корабли игрока для размещения"""
         self.player_ships_to_place = []
         for size, count in SHIPS.items():
             for _ in range(count):
@@ -126,7 +123,7 @@ class GameLogic:
             self.player_turn = False
 
         # Проверяем победу
-        if self.bot_field.all_ships_destroyed():
+        if self.bot_field.is_all_ships_destroyed():
             self.game_over = True
             self.winner = "player"
 
@@ -164,7 +161,7 @@ class GameLogic:
             self.player_turn = True
 
         # Проверяем победу
-        if self.player_field.all_ships_destroyed():
+        if self.player_field.is_all_ships_destroyed():
             self.game_over = True
             self.winner = "bot"
 

@@ -1,4 +1,4 @@
-from game_window import Battleship
+from battleship import Battleship
 
 
 def main() -> None:

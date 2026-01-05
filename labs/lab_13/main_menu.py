@@ -7,8 +7,9 @@ from typing import Callable
 
 from config import Colors
 
+
 class MainMenu(tk.Frame):
-    def __init__(self, parent: tk.Widget, start_game_callback: Callable[[], None]) -> None:
+    def __init__(self, parent: tk.Tk, start_game_callback: Callable[[], None]) -> None:
         """
         Инициализация главного меню
         

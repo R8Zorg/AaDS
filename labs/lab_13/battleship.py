@@ -1,7 +1,3 @@
-"""
-Класс GameWindow - главное окно игры
-"""
-
 import tkinter as tk
 from enum import Enum
 from tkinter import messagebox
@@ -22,10 +18,7 @@ class GameState(Enum):
 
 
 class Battleship(tk.Tk):
-    """Главное окно игры"""
-
     def __init__(self) -> None:
-        """Инициализация главного окна"""
         super().__init__()
 
         self.title("Морской Бой")
@@ -33,7 +26,7 @@ class Battleship(tk.Tk):
 
         self.game_logic: GameLogic = GameLogic()
 
-        self.current_state: str = GameState.MENU
+        self.current_state: GameState = GameState.MENU
 
         self.main_menu: Optional[MainMenu] = None
 

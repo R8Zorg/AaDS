@@ -1,25 +1,19 @@
-"""
-Конфигурация и константы для игры Морской бой
-"""
-
-from enum import Enum, auto
+from enum import Enum
 from typing import Dict
 
-# Размеры поля
 FIELD_SIZE: int = 10
 
 
 class CellState(Enum):
-    """Состояния клеток игрового поля"""
     EMPTY = 0
     SHIP = 1
     HIT = 2
     DESTROYED = 3
     MISS = 4
+    NO_SHIP = 5
 
 
 class Colors(Enum):
-    """Цветовая палитра приложения"""
     EMPTY = "#E8F4F8"
     SHIP = "#4A90E2"
     HIT = "#FF6B6B"
@@ -27,7 +21,7 @@ class Colors(Enum):
     MISS = "#B0BEC5"
     HOVER = "#FFE082"
     SELECTED = "#FFA726"
-    GRAY_MARK = "#CCCCCC"
+    BLACK_MARK = "#000000"
     BG = "#F5F5F5"
     MENU_BG = "#FFFFFF"
     BTN_PRIMARY = "#4CAF50"
@@ -38,7 +32,6 @@ class Colors(Enum):
 
 
 class GUISize(Enum):
-    """Размеры элементов GUI"""
     CELL_SIZE = 35
     PADDING = 20
     MENU_WIDTH = 280
@@ -47,22 +40,20 @@ class GUISize(Enum):
 
 
 class PlacementAlgorithm(Enum):
-    """Типы алгоритмов расстановки кораблей"""
     RANDOM = "random"
     ALGORITHM_1 = "algorithm1"
 
 
 class AttackAlgorithm(Enum):
-    """Типы алгоритмов атаки"""
     RANDOM = "random"
     ALGORITHM_1 = "algorithm1"
     ALGORITHM_2 = "algorithm2"
 
 
-# Корабли (размер: количество)
+# (размер: количество)
 SHIPS: Dict[int, int] = {
-    4: 1,  # Линкор
-    3: 2,  # Крейсер
-    2: 3,  # Эсминец
-    1: 4   # Катер
+    4: 1,
+    3: 2,
+    2: 3,
+    1: 4,
 }
