@@ -21,7 +21,7 @@ class GameState(Enum):
     GAME = "game"
 
 
-class GameWindow(tk.Tk):
+class Battleship(tk.Tk):
     """Главное окно игры"""
 
     def __init__(self) -> None:

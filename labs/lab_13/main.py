@@ -1,8 +1,8 @@
-from game_window import GameWindow
+from game_window import Battleship
 
 
 def main() -> None:
-    app: GameWindow = GameWindow()
+    app: Battleship = Battleship()
     app.mainloop()
 
 
