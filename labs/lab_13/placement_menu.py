@@ -187,7 +187,6 @@ class PlacementMenu(tk.Frame):
 
         ttk.Separator(self, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=5)
 
-        # Алгоритм расстановки бота
         bot_placement_frame: tk.Frame = tk.Frame(self, bg=Colors.MENU_BG.value)
         bot_placement_frame.pack(fill=tk.X, padx=10, pady=5)
 
@@ -216,7 +215,7 @@ class PlacementMenu(tk.Frame):
 
         rb_algo1: tk.Radiobutton = tk.Radiobutton(
             bot_placement_frame,
-            text="Алгоритм 1",
+            text="По алгоритму",
             variable=self.bot_placement_var,
             value=PlacementAlgorithm.ALGORITHM_1.value,
             command=self._on_bot_placement_change,
@@ -255,7 +254,7 @@ class PlacementMenu(tk.Frame):
 
         rb_attack_algo1: tk.Radiobutton = tk.Radiobutton(
             bot_attack_frame,
-            text="Алгоритм 1 (Поиск и охота)",
+            text="Поиск и охота",
             variable=self.bot_attack_var,
             value=AttackAlgorithm.ALGORITHM_1.value,
             bg=Colors.MENU_BG.value,
@@ -265,7 +264,7 @@ class PlacementMenu(tk.Frame):
 
         rb_attack_algo2: tk.Radiobutton = tk.Radiobutton(
             bot_attack_frame,
-            text="Алгоритм 2 (Тепловая карта)",
+            text="Тепловая карта",
             variable=self.bot_attack_var,
             value=AttackAlgorithm.ALGORITHM_2.value,
             bg=Colors.MENU_BG.value,
