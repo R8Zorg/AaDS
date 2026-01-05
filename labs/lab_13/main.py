@@ -1,13 +1,9 @@
-import tkinter as tk
-
-from battleship_gui import BattleshipGUI
+from game_window import GameWindow
 
 
-def main():
-    root = tk.Tk()
-    app = BattleshipGUI(root)
-    app.start()
-    root.mainloop()
+def main() -> None:
+    app: GameWindow = GameWindow()
+    app.mainloop()
 
 
 if __name__ == "__main__":
