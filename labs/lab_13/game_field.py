@@ -20,12 +20,12 @@ class GameField:
         self.ship_cells = {}
 
     def is_valid_position(self, ship: Ship, x: int, y: int) -> bool:
-        old_x, old_y = ship.x, ship.y  # TODO: ?
-        ship.x, ship.y = x, y
-
-        coords: List[Tuple[int, int]] = ship.get_coordinates()
-
-        ship.x, ship.y = old_x, old_y
+        coords: list[tuple[int, int]] = []
+        for i in range(ship.size):
+            if ship.is_horizontal:
+                coords.append((x + i, y))
+            else:
+                coords.append((x, y + i))
 
         for cx, cy in coords:
             if cx < 0 or cx >= FIELD_SIZE or cy < 0 or cy >= FIELD_SIZE:
@@ -36,29 +36,18 @@ class GameField:
                 for dy in range(-1, 2):
                     nx, ny = cx + dx, cy + dy
                     if 0 <= nx < FIELD_SIZE and 0 <= ny < FIELD_SIZE:
-                        if (nx, ny) in self.ship_cells and self.ship_cells[
-                            (nx, ny)
-                        ] != ship:
+                        if (nx, ny) in self.ship_cells:
                             return False
-
         return True
 
     def place_ship(self, ship: Ship, x: int, y: int) -> bool:
         if not self.is_valid_position(ship, x, y):
             return False
 
-        # Удаляем старые координаты, если корабль уже был размещён
-        # if ship.x is not None and ship.y is not None:
-        #     for coord in ship.get_coordinates():
-        #         if coord in self.ship_cells:
-        #             del self.ship_cells[coord]
-        #             self.field[coord[1]][coord[0]] = CellState.EMPTY
-
         ship.x = x
         ship.y = y
 
-        if ship not in self.ships:
-            self.ships.append(ship)
+        self.ships.append(ship)
 
         for coord in ship.get_coordinates():
             self.field[coord[1]][coord[0]] = CellState.SHIP
