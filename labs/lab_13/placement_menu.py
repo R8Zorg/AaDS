@@ -367,12 +367,12 @@ class PlacementMenu(tk.Frame):
         self.update_display()
 
     def _toggle_show_enemy(self) -> None:
-        """Переключает отображение вражеских кораблей"""
-        self.game_logic.toggle_show_enemy_ships()
+        self.game_logic.show_enemy_ships = self.show_enemy_var.get()
+        print(f"{self.show_enemy_var.get()=}")
 
     def _toggle_highlight(self) -> None:
-        """Переключает выделение соседних клеток"""
-        self.game_logic.toggle_highlight_adjacent()
+        self.game_logic.highlight_adjacent = self.highlight_adj_var.get()
+        print(f"{self.highlight_adj_var.get()=}")
 
     def _on_bot_placement_change(self) -> None:
         """Обработчик изменения алгоритма расстановки бота"""

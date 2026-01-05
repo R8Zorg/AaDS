@@ -1,7 +1,3 @@
-"""
-Класс GameLogic - основная игровая логика
-"""
-
 from typing import Dict, List, Optional, Tuple
 
 from attack_algorithms import AttackAlgorithms
@@ -181,14 +177,6 @@ class GameLogic:
     def get_bot_stats(self) -> Dict[str, int]:
         """Возвращает статистику бота"""
         return self.bot_field.get_stats()
-
-    def toggle_show_enemy_ships(self) -> None:
-        """Переключает отображение вражеских кораблей"""
-        self.show_enemy_ships = not self.show_enemy_ships
-
-    def toggle_highlight_adjacent(self) -> None:
-        """Переключает выделение соседних клеток"""
-        self.highlight_adjacent = not self.highlight_adjacent
 
     def set_bot_placement_algorithm(self, algorithm_type: PlacementAlgorithm) -> None:
         """Устанавливает алгоритм расстановки кораблей бота"""
