@@ -30,7 +30,6 @@ class Battleship(tk.Tk):
 
         self.main_menu: Optional[MainMenu] = None
 
-        # Игровые виджеты
         self.placement_menu: Optional[PlacementMenu] = None
         self.player_canvas: Optional[FieldCanvas] = None
         self.bot_canvas: Optional[FieldCanvas] = None
@@ -40,8 +39,6 @@ class Battleship(tk.Tk):
         self.restart_button: Optional[tk.Button] = None
         self.menu_button: Optional[tk.Button] = None
 
-        # Флаг для размещения кораблей
-        self.placing_ship: Optional[Ship] = None
         self.preview_position: Optional[Tuple[int, int]] = None
 
         self._show_main_menu()
