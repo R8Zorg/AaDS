@@ -43,8 +43,6 @@ class Battleship(tk.Tk):
 
         self._show_main_menu()
 
-        self._center_window()
-
     def _center_window(self) -> None:
         self.update_idletasks()
         width: int = self.winfo_width()
@@ -61,7 +59,6 @@ class Battleship(tk.Tk):
         self.main_menu = MainMenu(self, self._start_placement)
         self.main_menu.pack(fill=tk.BOTH, expand=True)
 
-        # Устанавливаем размер окна
         self.geometry("700x600")
         self._center_window()
 
@@ -417,7 +414,6 @@ class Battleship(tk.Tk):
         self._start_placement()
 
     def _clear_window(self) -> None:
-        """Очищает окно от всех виджетов"""
         for widget in self.winfo_children():
             widget.destroy()
 
