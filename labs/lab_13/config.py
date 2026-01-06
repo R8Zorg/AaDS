@@ -16,8 +16,8 @@ class CellState(Enum):
 class Colors(Enum):
     EMPTY = "#E8F4F8"
     SHIP = "#4A90E2"
-    HIT = "#FF6B6B"
-    DESTROYED = "#8B0000"
+    HIT = "#8B0000"
+    DESTROYED = "#FF6B6B"
     MISS = "#B0BEC5"
     HOVER = "#FFE082"
     SELECTED = "#FFA726"
@@ -50,7 +50,7 @@ class AttackAlgorithm(Enum):
     ALGORITHM_2 = "algorithm2"
 
 
-# (размер: количество)
+# размер: количество
 SHIPS: Dict[int, int] = {
     4: 1,
     3: 2,

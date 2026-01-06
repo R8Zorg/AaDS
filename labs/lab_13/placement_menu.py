@@ -1,7 +1,3 @@
-"""
-Класс PlacementMenu - меню для размещения кораблей
-"""
-
 import tkinter as tk
 from tkinter import ttk
 from typing import Callable, Dict, Optional, Tuple
@@ -12,24 +8,14 @@ from ship import Ship
 
 
 class PlacementMenu(tk.Frame):
-    """Меню размещения кораблей"""
-
     def __init__(
         self,
         parent: tk.Widget,
         game_logic: GameLogic,
         on_ready_callback: Callable[[], None],
         check_ready_button: Callable[[], None],
-        update_display: Callable[[], None]
+        update_display: Callable[[], None],
     ) -> None:
-        """
-        Инициализация меню размещения
-
-        Args:
-            parent: родительский виджет
-            game_logic: объект GameLogic
-            on_ready_callback: функция обратного вызова при нажатии "Готов"
-        """
         super().__init__(
             parent, bg=Colors.MENU_BG.value, relief=tk.RAISED, borderwidth=2
         )
@@ -43,8 +29,6 @@ class PlacementMenu(tk.Frame):
         self._create_widgets()
 
     def _create_widgets(self) -> None:
-        """Создаёт виджеты меню"""
-        # Заголовок
         title: tk.Label = tk.Label(
             self,
             text="Размещение кораблей",
@@ -53,23 +37,21 @@ class PlacementMenu(tk.Frame):
         )
         title.pack(pady=(10, 5))
 
-        # Разделитель
         ttk.Separator(self, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=5)
 
-        # Правила
-        rules_frame: tk.Frame = tk.Frame(self, bg=Colors.MENU_BG.value)
-        rules_frame.pack(fill=tk.BOTH, padx=10, pady=5)
+        instructions_frame: tk.Frame = tk.Frame(self, bg=Colors.MENU_BG.value)
+        instructions_frame.pack(fill=tk.BOTH, padx=10, pady=5)
 
-        rules_label: tk.Label = tk.Label(
-            rules_frame,
-            text="Правила:",
+        instructions_label: tk.Label = tk.Label(
+            instructions_frame,
+            text="Инструкции:",
             font=("Arial", 11, "bold"),
             bg=Colors.MENU_BG.value,
         )
-        rules_label.pack(anchor=tk.W)
+        instructions_label.pack(anchor=tk.W)
 
-        rules_text: tk.Text = tk.Text(
-            rules_frame,
+        instructions_text: tk.Text = tk.Text(
+            instructions_frame,
             height=8,
             width=30,
             wrap=tk.WORD,
@@ -78,8 +60,8 @@ class PlacementMenu(tk.Frame):
             relief=tk.FLAT,
             cursor="arrow",
         )
-        rules_text.pack(fill=tk.BOTH)
-        rules_text.insert(
+        instructions_text.pack(fill=tk.BOTH)
+        instructions_text.insert(
             "1.0",
             "• Расставьте все корабли\n"
             "• 1 линкор (4 клетки)\n"
@@ -91,11 +73,10 @@ class PlacementMenu(tk.Frame):
             "• ПКМ - повернуть корабль\n"
             "• СКМ - удалить корабль",
         )
-        rules_text.config(state=tk.DISABLED)
+        instructions_text.config(state=tk.DISABLED)
 
         ttk.Separator(self, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=5)
 
-        # Список кораблей для размещения
         ships_frame: tk.Frame = tk.Frame(self, bg=Colors.MENU_BG.value)
         ships_frame.pack(fill=tk.BOTH, padx=10, pady=5)
 
@@ -115,7 +96,6 @@ class PlacementMenu(tk.Frame):
 
         ttk.Separator(self, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=5)
 
-        # Кнопки автоматического размещения
         auto_frame: tk.Frame = tk.Frame(self, bg=Colors.MENU_BG.value)
         auto_frame.pack(fill=tk.X, padx=10, pady=5)
 
@@ -141,7 +121,7 @@ class PlacementMenu(tk.Frame):
         btn_algo1: tk.Button = tk.Button(
             auto_frame,
             text="По алгоритму",
-            command=self._auto_place_algo1,
+            command=self._auto_place_algoythm,
             bg=Colors.BTN_SECONDARY.value,
             fg="white",
             font=("Arial", 9),
@@ -151,7 +131,6 @@ class PlacementMenu(tk.Frame):
 
         ttk.Separator(self, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=5)
 
-        # Настройки
         settings_frame: tk.Frame = tk.Frame(self, bg=Colors.MENU_BG.value)
         settings_frame.pack(fill=tk.X, padx=10, pady=5)
 
@@ -168,18 +147,18 @@ class PlacementMenu(tk.Frame):
             settings_frame,
             text="Показывать вражеские корабли",
             variable=self.show_enemy_var,
-            command=self._toggle_show_enemy,
+            command=self.update_show_enemy_mark,
             bg=Colors.MENU_BG.value,
             font=("Arial", 9),
         )
         check_enemy.pack(anchor=tk.W)
 
-        self.highlight_adj_var: tk.BooleanVar = tk.BooleanVar(value=True)
+        self.highlight_surrounding_var: tk.BooleanVar = tk.BooleanVar(value=False)
         check_highlight: tk.Checkbutton = tk.Checkbutton(
             settings_frame,
             text="Выделять соседние клетки",
-            variable=self.highlight_adj_var,
-            command=self._toggle_highlight,
+            variable=self.highlight_surrounding_var,
+            command=self.update_highlight_mark,
             bg=Colors.MENU_BG.value,
             font=("Arial", 9),
         )
@@ -320,21 +299,17 @@ class PlacementMenu(tk.Frame):
                             break
                     return
 
-        # Если нет неразмещённых кораблей
         self.selected_ship = None
 
     def _on_ship_select(self, event: tk.Event) -> None:
-        """Обработчик выбора корабля из списка"""
         selection: Tuple = self.ships_listbox.curselection()
         if not selection:
             return
 
-        # Определяем размер выбранного корабля
         index: int = selection[0]
         items: Tuple = self.ships_listbox.get(0, tk.END)
         selected_text: str = items[index]
 
-        # Парсим размер корабля из текста
         if "Линкор" in selected_text:
             size: int = 4
         elif "Крейсер" in selected_text:
@@ -344,45 +319,37 @@ class PlacementMenu(tk.Frame):
         else:
             size = 1
 
-        # Находим первый неразмещённый корабль этого размера
         for ship in self.game_logic.player_ships_to_place:
             if ship.size == size and ship.x is None:
                 self.selected_ship = ship
                 break
 
     def _auto_place_random(self) -> None:
-        """Автоматическое случайное размещение"""
         self.game_logic.auto_place_player_ships(PlacementAlgorithm.RANDOM)
         self.selected_ship = None
         self.update_ships_list()
         self.check_ready_button()
         self.update_display()
 
-    def _auto_place_algo1(self) -> None:
-        """Автоматическое размещение алгоритм 1"""
+    def _auto_place_algoythm(self) -> None:
         self.game_logic.auto_place_player_ships(PlacementAlgorithm.ALGORITHM_1)
         self.selected_ship = None
         self.update_ships_list()
         self.check_ready_button()
         self.update_display()
 
-    def _toggle_show_enemy(self) -> None:
+    def update_show_enemy_mark(self) -> None:
         self.game_logic.show_enemy_ships = self.show_enemy_var.get()
-        print(f"{self.show_enemy_var.get()=}")
 
-    def _toggle_highlight(self) -> None:
-        self.game_logic.highlight_adjacent = self.highlight_adj_var.get()
-        print(f"{self.highlight_adj_var.get()=}")
+    def update_highlight_mark(self) -> None:
+        self.game_logic.highlight_surrounding = self.highlight_surrounding_var.get()
 
     def _on_bot_placement_change(self) -> None:
-        """Обработчик изменения алгоритма расстановки бота"""
         algo_value: str = self.bot_placement_var.get()
         self.game_logic.set_bot_placement_algorithm(PlacementAlgorithm(algo_value))
 
     def get_selected_ship(self) -> Optional[Ship]:
-        """Возвращает выбранный корабль"""
         return self.selected_ship
 
     def get_bot_attack_algorithm(self) -> AttackAlgorithm:
-        """Возвращает выбранный алгоритм атаки бота"""
         return AttackAlgorithm(self.bot_attack_var.get())

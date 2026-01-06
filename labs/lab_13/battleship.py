@@ -3,7 +3,7 @@ from enum import Enum
 from tkinter import messagebox
 from typing import Dict, Optional, Tuple
 
-from config import FIELD_SIZE, AttackAlgorithm, Colors, GUISize
+from config import FIELD_SIZE, AttackAlgorithm, CellState, Colors, GUISize
 from field_canvas import FieldCanvas
 from game_logic import GameLogic
 from main_menu import MainMenu
@@ -270,113 +270,95 @@ class Battleship(tk.Tk):
             self.ready_button.config(state=tk.DISABLED, bg=Colors.BTN_DISABLED.value)
 
     def _on_ready(self) -> None:
-        """Обработчик нажатия кнопки Готов"""
         if not self.game_logic.all_player_ships_placed():
             messagebox.showwarning(
                 "Внимание", "Разместите все корабли перед началом игры!"
             )
             return
 
-        # Получаем алгоритм атаки бота
         attack_algorithm: AttackAlgorithm = (
             self.placement_menu.get_bot_attack_algorithm()
         )
+        self.placement_menu.update_show_enemy_mark()
+        self.placement_menu.update_highlight_mark()
 
-        # Начинаем игру
         if self.game_logic.start_game(attack_algorithm):
             self._start_game_screen()
 
     def _start_game_screen(self) -> None:
-        """Переключает на экран игры"""
         self.current_state = GameState.GAME
 
-        # Удаляем меню размещения
         if self.placement_menu:
             self.placement_menu.destroy()
             self.placement_menu = None
 
-        # Отключаем кнопку Готов
         if self.ready_button:
             self.ready_button.config(state=tk.DISABLED)
 
-        # Привязываем клик по полю бота
         if self.bot_canvas:
             self.bot_canvas.click_callback = self._on_bot_field_click
 
-        # Обновляем отображение
         self._update_display()
 
-        # Уменьшаем размер окна и центрируем
         self.geometry("")
         self._center_window()
 
     def _on_bot_field_click(self, x: int, y: int) -> None:
-        """Обработчик клика по полю бота"""
         if self.current_state != GameState.GAME or self.game_logic.game_over:
             return
 
         if not self.game_logic.player_turn:
             return
 
-        # Атакуем
-        result: str = self.game_logic.player_attack(x, y)
+        result: Optional[CellState] = self.game_logic.player_attack(x, y)
 
-        if result == "already_attacked":
+        if result is None:
             return
 
         self._update_display()
 
-        # Проверяем победу
         if self.game_logic.game_over:
             self._show_game_over()
             return
 
-        # Если промах, ход переходит к боту
         if not self.game_logic.player_turn:
             self.after(500, self._bot_turn)
 
     def _bot_turn(self) -> None:
-        """Ход бота"""
         if self.game_logic.game_over or self.game_logic.player_turn:
             return
 
-        result: Optional[Tuple[Tuple[int, int], str]] = self.game_logic.bot_attack()
+        result: Optional[Tuple[Tuple[int, int], Optional[CellState]]] = (
+            self.game_logic.bot_attack()
+        )
 
         if result:
             self._update_display()
 
-            # Проверяем победу
             if self.game_logic.game_over:
                 self._show_game_over()
                 return
 
-            # Если попадание, бот стреляет ещё раз
             coords, attack_result = result
-            if attack_result in ["hit", "destroyed"]:
+            if attack_result in [CellState.HIT, CellState.DESTROYED]:
                 self.after(500, self._bot_turn)
 
     def _update_display(self) -> None:
-        """Обновляет отображение полей"""
         if not self.player_canvas or not self.bot_canvas:
             return
 
-        # Обновляем поле игрока
         self.player_canvas.draw_field(
             self.game_logic.player_field.field,
             show_ships=True,
-            highlight_adjacent=self.game_logic.highlight_adjacent,
-            game_started=self.game_logic.game_started,
+            highlight_surrounding=self.game_logic.highlight_surrounding,
         )
 
-        # Обновляем поле бота
         self.bot_canvas.draw_field(
             self.game_logic.bot_field.field,
             show_ships=self.game_logic.show_enemy_ships,
-            highlight_adjacent=self.game_logic.highlight_adjacent,
-            game_started=self.game_logic.game_started,
+            highlight_surrounding=self.game_logic.highlight_surrounding,
         )
 
-        # Обновляем статистику
         if self.player_stats_label and self.bot_stats_label:
             player_stats: Dict[str, int] = self.game_logic.get_player_stats()
             bot_stats: Dict[str, int] = self.game_logic.get_bot_stats()
@@ -384,22 +366,17 @@ class Battleship(tk.Tk):
             player_text: str = (
                 f"Потоплено: {player_stats['destroyed_ships']}/"
                 f"{player_stats['total_ships']} кораблей "
-                f"({player_stats['destroyed_cells']}/"
-                f"{player_stats['total_cells']} клеток)"
             )
 
             bot_text: str = (
                 f"Потоплено: {bot_stats['destroyed_ships']}/"
                 f"{bot_stats['total_ships']} кораблей "
-                f"({bot_stats['destroyed_cells']}/"
-                f"{bot_stats['total_cells']} клеток)"
             )
 
             self.player_stats_label.config(text=player_text)
             self.bot_stats_label.config(text=bot_text)
 
     def _show_game_over(self) -> None:
-        """Показывает окно окончания игры"""
         if self.game_logic.winner == "player":
             message: str = "Поздравляем! Вы победили!"
             title: str = "Победа!"
@@ -410,7 +387,6 @@ class Battleship(tk.Tk):
         messagebox.showinfo(title, message)
 
     def _restart_game(self) -> None:
-        """Перезапускает игру"""
         self._start_placement()
 
     def _clear_window(self) -> None:
