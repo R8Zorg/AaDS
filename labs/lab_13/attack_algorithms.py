@@ -3,6 +3,7 @@ from enum import Enum
 from typing import List, Optional, Tuple
 
 from config import FIELD_SIZE, SHIPS, AttackAlgorithm, CellState
+from field_canvas import FieldCanvas
 from game_field import GameField
 
 
@@ -66,8 +67,10 @@ class AttackAlgorithms:
         available: List[Tuple[int, int]] = []
         for y in range(FIELD_SIZE):
             for x in range(FIELD_SIZE):
-                if player_field.field[y][x] not in DO_NOT_ATTACK_CELLS:
-                    available.append((x, y))
+                if player_field.field[y][x] in DO_NOT_ATTACK_CELLS:
+                    continue
+
+                available.append((x, y))
 
         return random.choice(available) if available else None
 
@@ -90,14 +93,15 @@ class AttackAlgorithms:
         candidates: List[Tuple[int, int]] = []
         for y in range(FIELD_SIZE):
             for x in range(FIELD_SIZE):
-                if player_field.field[y][x] not in DO_NOT_ATTACK_CELLS:
-                    if (x + y + 1) % search_size == 0:
-                        candidates.append((x, y))
+                if player_field.field[y][x] in DO_NOT_ATTACK_CELLS:
+                    continue
 
-        # if candidates:
+                if (x + y + 1) % search_size != 0:
+                    continue
+
+                candidates.append((x, y))
+
         return random.choice(candidates)
-
-        # return self._random_attack(player_field)
 
     def _hunt_mode(self, player_field: GameField) -> Optional[Tuple[int, int]]:
         if not self.potential_targets:
@@ -122,13 +126,15 @@ class AttackAlgorithms:
 
         for y in range(FIELD_SIZE):
             for x in range(FIELD_SIZE):
-                if player_field.field[y][x] not in DO_NOT_ATTACK_CELLS:
-                    heat: int = self.heat_map[y][x]
-                    if heat > max_heat:
-                        max_heat = heat
-                        best_targets = [(x, y)]
-                    elif heat == max_heat:
-                        best_targets.append((x, y))
+                if player_field.field[y][x] in DO_NOT_ATTACK_CELLS:
+                    continue
+
+                heat: int = self.heat_map[y][x]
+                if heat > max_heat:
+                    max_heat = heat
+                    best_targets = [(x, y)]
+                elif heat == max_heat:
+                    best_targets.append((x, y))
 
         return random.choice(best_targets) if best_targets else None
 
@@ -136,54 +142,78 @@ class AttackAlgorithms:
         self.heat_map = [[0 for _ in range(FIELD_SIZE)] for _ in range(FIELD_SIZE)]
 
         for x, y, priority in self.priority_zones:
-            if player_field.field[y][x] not in DO_NOT_ATTACK_CELLS:
-                self.heat_map[y][x] = priority
+            if player_field.field[y][x] in DO_NOT_ATTACK_CELLS:
+                continue
+
+            self.heat_map[y][x] = priority
 
         for y in range(FIELD_SIZE):
             for x in range(FIELD_SIZE):
-                if player_field.field[y][x] == CellState.HIT:
-                    for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-                        nx, ny = x + dx, y + dy
-                        if 0 <= nx < FIELD_SIZE and 0 <= ny < FIELD_SIZE:
-                            if player_field.field[ny][nx] not in DO_NOT_ATTACK_CELLS:
-                                self.heat_map[ny][nx] += 10
+                if player_field.field[y][x] != CellState.HIT:
+                    continue
+
+                for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                    nx, ny = x + dx, y + dy
+                    if not FieldCanvas.in_field(nx, ny):
+                        continue
+
+                    if player_field.field[ny][nx] in DO_NOT_ATTACK_CELLS:
+                        continue
+
+                    self.heat_map[ny][nx] += 10
 
         for size in [4, 3, 2, 1]:
-            if len([s for s in self.found_ship_sizes if s == size]) < SHIPS[size]:
-                self._add_ship_possibilities(player_field, size)
+            if len([s for s in self.found_ship_sizes if s == size]) >= SHIPS[size]:
+                continue
+
+            self._add_ship_possibilities(player_field, size)
 
     def _add_ship_possibilities(self, player_field: GameField, size: int) -> None:
         for y in range(FIELD_SIZE):
             for x in range(FIELD_SIZE):
                 can_fit_horizontal: bool = True
-                if x + size <= FIELD_SIZE:
+                if x + size > FIELD_SIZE:
+                    continue
+
+                for i in range(size):
+                    if player_field.field[y][x + i] not in [
+                        CellState.DESTROYED,
+                        CellState.MISS,
+                        CellState.NO_SHIP,
+                    ]:
+                        continue
+
+                    can_fit_horizontal = False
+                    break
+
+                if can_fit_horizontal:
                     for i in range(size):
-                        if player_field.field[y][x + i] in [
-                            CellState.DESTROYED,
-                            CellState.MISS,
-                            CellState.NO_SHIP,
-                        ]:
-                            can_fit_horizontal = False
-                            break
-                    if can_fit_horizontal:
-                        for i in range(size):
-                            if player_field.field[y][x + i] not in DO_NOT_ATTACK_CELLS:
-                                self.heat_map[y][x + i] += 1
+                        if player_field.field[y][x + i] in DO_NOT_ATTACK_CELLS:
+                            continue
+
+                        self.heat_map[y][x + i] += 1
 
                 can_fit_vertical: bool = True
-                if y + size <= FIELD_SIZE:
+                if y + size > FIELD_SIZE:
+                    continue
+
+                for i in range(size):
+                    if player_field.field[y + i][x] not in [
+                        CellState.DESTROYED,
+                        CellState.MISS,
+                        CellState.NO_SHIP,
+                    ]:
+                        continue
+
+                    can_fit_vertical = False
+                    break
+
+                if can_fit_vertical:
                     for i in range(size):
-                        if player_field.field[y + i][x] in [
-                            CellState.DESTROYED,
-                            CellState.MISS,
-                            CellState.NO_SHIP,
-                        ]:
-                            can_fit_vertical = False
-                            break
-                    if can_fit_vertical:
-                        for i in range(size):
-                            if player_field.field[y + i][x] not in DO_NOT_ATTACK_CELLS:
-                                self.heat_map[y + i][x] += 1
+                        if player_field.field[y + i][x] in DO_NOT_ATTACK_CELLS:
+                            continue
+
+                        self.heat_map[y + i][x] += 1
 
     def process_attack_result(
         self, x: int, y: int, result: Optional[CellState], player_field: GameField
@@ -194,11 +224,15 @@ class AttackAlgorithms:
 
             if len(self.target_ship) == 1:
                 self.potential_targets = []
-                for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-                    nx, ny = x + dx, y + dy
-                    if 0 <= nx < FIELD_SIZE and 0 <= ny < FIELD_SIZE:
-                        if player_field.field[ny][nx] not in DO_NOT_ATTACK_CELLS:
-                            self.potential_targets.append((nx, ny))
+                for offset_x, offset_y in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                    next_x, next_y = x + offset_x, y + offset_y
+                    if not FieldCanvas.in_field(next_x, next_y):
+                        continue
+
+                    if player_field.field[next_y][next_x] in DO_NOT_ATTACK_CELLS:
+                        continue
+
+                    self.potential_targets.append((next_x, next_y))
             else:
                 if self.target_ship[0][0] == self.target_ship[1][0]:
                     self.ship_orientation = ShipOrientation.VERTICAL
