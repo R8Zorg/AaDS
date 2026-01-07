@@ -1,7 +1,7 @@
 from typing import Dict, List, Optional, Tuple
 
 from attack_algorithms import AttackAlgorithms
-from config import SHIPS, AttackAlgorithm, PlacementAlgorithm, CellState
+from config import SHIPS, AttackAlgorithm, CellState, PlacementAlgorithm
 from game_field import GameField
 from placement_algorithms import PlacementAlgorithms
 from ship import Ship
@@ -65,10 +65,9 @@ class GameLogic:
     def auto_place_player_ships(self, algorithm_type: PlacementAlgorithm) -> None:
         self.player_field.reset()
         self.player_ships_to_place = []
-        ships: List[Ship] = PlacementAlgorithms.place_ships(
+        self.player_ships_to_place = PlacementAlgorithms.place_ships(
             self.player_field, algorithm_type
         )
-        self.player_ships_to_place = ships
 
     def player_attack(self, x: int, y: int) -> Optional[CellState]:
         if not self.game_started or not self.player_turn:
