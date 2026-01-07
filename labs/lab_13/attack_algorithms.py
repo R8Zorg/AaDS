@@ -1,6 +1,6 @@
 import random
 from enum import Enum
-from typing import List, Optional, Tuple
+from typing import List, Optional, Set, Tuple
 
 from config import FIELD_SIZE, SHIPS, AttackAlgorithm, CellState
 from field_canvas import FieldCanvas
@@ -17,12 +17,20 @@ class ShipOrientation(Enum):
     VERTICAL = "vertical"
 
 
-DO_NOT_ATTACK_CELLS: List[CellState] = [
+DO_NOT_ATTACK_CELLS: Set[CellState] = {
     CellState.HIT,
     CellState.DESTROYED,
     CellState.MISS,
     CellState.NO_SHIP,
-]
+}
+
+INVALID_CELLS: Set[CellState] = {
+    CellState.DESTROYED,
+    CellState.MISS,
+    CellState.NO_SHIP,
+}
+
+DIRECTIONS: List[Tuple[int, int]] = [(0, 1), (0, -1), (1, 0), (-1, 0)]
 
 
 class AttackAlgorithms:
@@ -32,88 +40,83 @@ class AttackAlgorithms:
         self.target_ship: List[Tuple[int, int]] = []
         self.potential_targets: List[Tuple[int, int]] = []
         self.ship_orientation: Optional[ShipOrientation] = None
-        self.current_search_size: int = 4
         self.found_ship_sizes: List[int] = []
 
         self.priority_zones: List[Tuple[int, int, int]] = self._init_priority_zones()
-        self.heat_map: List[List[int]] = [
-            [0 for _ in range(FIELD_SIZE)] for _ in range(FIELD_SIZE)
-        ]
+        self.heat_map: List[List[int]] = [[0] * FIELD_SIZE for _ in range(FIELD_SIZE)]
+
+        self.attack_methods = {
+            AttackAlgorithm.RANDOM: self._random_attack,
+            AttackAlgorithm.ALGORITHM_1: self._algorithm1_attack,
+            AttackAlgorithm.ALGORITHM_2: self._algorithm2_attack,
+        }
 
     def _init_priority_zones(self) -> List[Tuple[int, int, int]]:
         zones: List[Tuple[int, int, int]] = []
-        for x in range(3, 7):
-            for y in range(3, 7):
-                zones.append((x, y, 3))
+        center_coords = {(x, y) for x in range(3, 7) for y in range(3, 7)}
 
-        for x in range(2, 8):
-            for y in range(2, 8):
-                if not any(z[0] == x and z[1] == y for z in zones):
-                    zones.append((x, y, 2))
+        zones.extend((x, y, 3) for x, y in center_coords)
+        zones.extend(
+            (x, y, 2)
+            for x in range(2, 8)
+            for y in range(2, 8)
+            if (x, y) not in center_coords
+        )
 
         return zones
 
     def get_next_attack(self, player_field: GameField) -> Optional[Tuple[int, int]]:
-        if self.algorithm_type == AttackAlgorithm.RANDOM:
-            return self._random_attack(player_field)
-        elif self.algorithm_type == AttackAlgorithm.ALGORITHM_1:
-            return self._algorithm1_attack(player_field)
-        elif self.algorithm_type == AttackAlgorithm.ALGORITHM_2:
-            return self._algorithm2_attack(player_field)
-        else:
-            return self._random_attack(player_field)
+        return self.attack_methods.get(self.algorithm_type, self._random_attack)(
+            player_field
+        )
 
     def _random_attack(self, player_field: GameField) -> Optional[Tuple[int, int]]:
-        available: List[Tuple[int, int]] = []
-        for y in range(FIELD_SIZE):
-            for x in range(FIELD_SIZE):
-                if player_field.field[y][x] in DO_NOT_ATTACK_CELLS:
-                    continue
-
-                available.append((x, y))
-
+        available = [
+            (x, y)
+            for y in range(FIELD_SIZE)
+            for x in range(FIELD_SIZE)
+            if player_field.field[y][x] not in DO_NOT_ATTACK_CELLS
+        ]
         return random.choice(available) if available else None
 
     def _algorithm1_attack(self, player_field: GameField) -> Optional[Tuple[int, int]]:
         if self.mode == AttackMode.HUNT and self.potential_targets:
             return self._hunt_mode(player_field)
-        else:
-            return self._search_mode(player_field)
+        return self._search_mode(player_field)
 
     def _search_mode(self, player_field: GameField) -> Optional[Tuple[int, int]]:
-        if len([s for s in self.found_ship_sizes if s == 4]) == 0:
-            search_size: int = 4
-        elif len([s for s in self.found_ship_sizes if s == 3]) < 2:
+        ship_counts = {
+            size: sum(1 for s in self.found_ship_sizes if s == size)
+            for size in [4, 3, 2]
+        }
+
+        if ship_counts[4] == 0:
+            search_size = 4
+        elif ship_counts[3] < 2:
             search_size = 3
-        elif len([s for s in self.found_ship_sizes if s == 2]) < 3:
+        elif ship_counts[2] < 3:
             search_size = 2
         else:
             search_size = 1
 
-        candidates: List[Tuple[int, int]] = []
-        for y in range(FIELD_SIZE):
-            for x in range(FIELD_SIZE):
-                if player_field.field[y][x] in DO_NOT_ATTACK_CELLS:
-                    continue
+        candidates = [
+            (x, y)
+            for y in range(FIELD_SIZE)
+            for x in range(FIELD_SIZE)
+            if player_field.field[y][x] not in DO_NOT_ATTACK_CELLS
+            and (x + y + 1) % search_size == 0
+        ]
 
-                if (x + y + 1) % search_size != 0:
-                    continue
-
-                candidates.append((x, y))
-
-        return random.choice(candidates)
+        return random.choice(candidates) if candidates else None
 
     def _hunt_mode(self, player_field: GameField) -> Optional[Tuple[int, int]]:
-        if not self.potential_targets:
-            self.mode = AttackMode.SEARCH
-            return self._search_mode(player_field)
+        while self.potential_targets:
+            target = self.potential_targets.pop(0)
+            if player_field.field[target[1]][target[0]] not in DO_NOT_ATTACK_CELLS:
+                return target
 
-        target: Tuple[int, int] = self.potential_targets.pop(0)
-
-        if player_field.field[target[1]][target[0]] in DO_NOT_ATTACK_CELLS:
-            return self._hunt_mode(player_field)
-
-        return target
+        self.mode = AttackMode.SEARCH
+        return self._search_mode(player_field)
 
     def _algorithm2_attack(self, player_field: GameField) -> Optional[Tuple[int, int]]:
         if self.mode == AttackMode.HUNT and self.potential_targets:
@@ -121,15 +124,15 @@ class AttackAlgorithms:
 
         self._update_heat_map(player_field)
 
-        max_heat: int = -1
-        best_targets: List[Tuple[int, int]] = []
+        max_heat = -1
+        best_targets = []
 
         for y in range(FIELD_SIZE):
             for x in range(FIELD_SIZE):
                 if player_field.field[y][x] in DO_NOT_ATTACK_CELLS:
                     continue
 
-                heat: int = self.heat_map[y][x]
+                heat = self.heat_map[y][x]
                 if heat > max_heat:
                     max_heat = heat
                     best_targets = [(x, y)]
@@ -139,54 +142,49 @@ class AttackAlgorithms:
         return random.choice(best_targets) if best_targets else None
 
     def _update_heat_map(self, player_field: GameField) -> None:
-        self.heat_map = [[0 for _ in range(FIELD_SIZE)] for _ in range(FIELD_SIZE)]
+        self.heat_map = [[0] * FIELD_SIZE for _ in range(FIELD_SIZE)]
 
         for x, y, priority in self.priority_zones:
-            if player_field.field[y][x] in DO_NOT_ATTACK_CELLS:
-                continue
-
-            self.heat_map[y][x] = priority
+            if player_field.field[y][x] not in DO_NOT_ATTACK_CELLS:
+                self.heat_map[y][x] = priority
 
         for y in range(FIELD_SIZE):
             for x in range(FIELD_SIZE):
                 if player_field.field[y][x] != CellState.HIT:
                     continue
 
-                for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                for dx, dy in DIRECTIONS:
                     nx, ny = x + dx, y + dy
-                    if not FieldCanvas.in_field(nx, ny):
-                        continue
+                    if (
+                        FieldCanvas.in_field(nx, ny)
+                        and player_field.field[ny][nx] not in DO_NOT_ATTACK_CELLS
+                    ):
+                        self.heat_map[ny][nx] += 10
 
-                    if player_field.field[ny][nx] in DO_NOT_ATTACK_CELLS:
-                        continue
+        ship_counts = {
+            size: sum(1 for s in self.found_ship_sizes if s == size)
+            for size in [4, 3, 2, 1]
+        }
 
-                    self.heat_map[ny][nx] += 10
-
-        for size in [4, 3, 2, 1]:
-            if len([s for s in self.found_ship_sizes if s == size]) >= SHIPS[size]:
-                continue
-
-            self._add_ship_possibilities(player_field, size)
+        for size, count in ship_counts.items():
+            if count < SHIPS[size]:
+                self._add_ship_possibilities(player_field, size)
 
     def _add_ship_possibilities(self, player_field: GameField, size: int) -> None:
-        invalid_cells = {CellState.DESTROYED, CellState.MISS, CellState.NO_SHIP}
-
         for y in range(FIELD_SIZE):
             for x in range(FIELD_SIZE):
                 if x + size <= FIELD_SIZE:
-                    cells_horizontal = [
-                        player_field.field[y][x + i] for i in range(size)
-                    ]
-                    if not any(cell in invalid_cells for cell in cells_horizontal):
+                    cells = [player_field.field[y][x + i] for i in range(size)]
+                    if not any(cell in INVALID_CELLS for cell in cells):
                         for i in range(size):
-                            if cells_horizontal[i] not in DO_NOT_ATTACK_CELLS:
+                            if cells[i] not in DO_NOT_ATTACK_CELLS:
                                 self.heat_map[y][x + i] += 1
 
                 if y + size <= FIELD_SIZE:
-                    cells_vertical = [player_field.field[y + i][x] for i in range(size)]
-                    if not any(cell in invalid_cells for cell in cells_vertical):
+                    cells = [player_field.field[y + i][x] for i in range(size)]
+                    if not any(cell in INVALID_CELLS for cell in cells):
                         for i in range(size):
-                            if cells_vertical[i] not in DO_NOT_ATTACK_CELLS:
+                            if cells[i] not in DO_NOT_ATTACK_CELLS:
                                 self.heat_map[y + i][x] += 1
 
     def process_attack_result(
@@ -197,28 +195,23 @@ class AttackAlgorithms:
             self.target_ship.append((x, y))
 
             if len(self.target_ship) == 1:
-                self.potential_targets = []
-                for offset_x, offset_y in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-                    next_x, next_y = x + offset_x, y + offset_y
-                    if not FieldCanvas.in_field(next_x, next_y):
-                        continue
-
-                    if player_field.field[next_y][next_x] in DO_NOT_ATTACK_CELLS:
-                        continue
-
-                    self.potential_targets.append((next_x, next_y))
+                self.potential_targets = [
+                    (x + dx, y + dy)
+                    for dx, dy in DIRECTIONS
+                    if FieldCanvas.in_field(x + dx, y + dy)
+                    and player_field.field[y + dy][x + dx] not in DO_NOT_ATTACK_CELLS
+                ]
             else:
-                if self.target_ship[0][0] == self.target_ship[1][0]:
-                    self.ship_orientation = ShipOrientation.VERTICAL
-                else:
-                    self.ship_orientation = ShipOrientation.HORIZONTAL
-
+                self.ship_orientation = (
+                    ShipOrientation.VERTICAL
+                    if self.target_ship[0][0] == self.target_ship[1][0]
+                    else ShipOrientation.HORIZONTAL
+                )
                 self._update_targets_by_orientation(x, y, player_field)
 
         elif result == CellState.DESTROYED:
-            if len(self.target_ship) > 0:
-                ship_size: int = len(self.target_ship) + 1
-                self.found_ship_sizes.append(ship_size)
+            if self.target_ship:
+                self.found_ship_sizes.append(len(self.target_ship) + 1)
 
             self.mode = AttackMode.SEARCH
             self.target_ship = []
@@ -231,31 +224,22 @@ class AttackAlgorithms:
         self.potential_targets = []
 
         if self.ship_orientation == ShipOrientation.HORIZONTAL:
-            min_x: int = min(coord[0] for coord in self.target_ship)
-            max_x: int = max(coord[0] for coord in self.target_ship)
+            min_x = min(coord[0] for coord in self.target_ship)
+            max_x = max(coord[0] for coord in self.target_ship)
 
-            if (
-                min_x > 0
-                and player_field.field[y][min_x - 1] not in DO_NOT_ATTACK_CELLS
-            ):
-                self.potential_targets.append((min_x - 1, y))
-            if (
-                max_x < FIELD_SIZE - 1
-                and player_field.field[y][max_x + 1] not in DO_NOT_ATTACK_CELLS
-            ):
-                self.potential_targets.append((max_x + 1, y))
-
+            for nx, check_x in [
+                (min_x - 1, min_x > 0),
+                (max_x + 1, max_x < FIELD_SIZE - 1),
+            ]:
+                if check_x and player_field.field[y][nx] not in DO_NOT_ATTACK_CELLS:
+                    self.potential_targets.append((nx, y))
         else:
-            min_y: int = min(coord[1] for coord in self.target_ship)
-            max_y: int = max(coord[1] for coord in self.target_ship)
+            min_y = min(coord[1] for coord in self.target_ship)
+            max_y = max(coord[1] for coord in self.target_ship)
 
-            if (
-                min_y > 0
-                and player_field.field[min_y - 1][x] not in DO_NOT_ATTACK_CELLS
-            ):
-                self.potential_targets.append((x, min_y - 1))
-            if (
-                max_y < FIELD_SIZE - 1
-                and player_field.field[max_y + 1][x] not in DO_NOT_ATTACK_CELLS
-            ):
-                self.potential_targets.append((x, max_y + 1))
+            for ny, check_y in [
+                (min_y - 1, min_y > 0),
+                (max_y + 1, max_y < FIELD_SIZE - 1),
+            ]:
+                if check_y and player_field.field[ny][x] not in DO_NOT_ATTACK_CELLS:
+                    self.potential_targets.append((x, ny))
