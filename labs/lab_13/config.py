@@ -31,6 +31,7 @@ class Colors(Enum):
     BTN_READY = "#81C784"
     LINE = "#CCCCCC"
     INVALID = "#FF5252"
+    FOREGROUND = "#666666"
 
 
 class GUISize(Enum):
