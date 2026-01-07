@@ -169,51 +169,25 @@ class AttackAlgorithms:
             self._add_ship_possibilities(player_field, size)
 
     def _add_ship_possibilities(self, player_field: GameField, size: int) -> None:
+        invalid_cells = {CellState.DESTROYED, CellState.MISS, CellState.NO_SHIP}
+
         for y in range(FIELD_SIZE):
             for x in range(FIELD_SIZE):
-                can_fit_horizontal: bool = True
-                if x + size > FIELD_SIZE:
-                    continue
+                if x + size <= FIELD_SIZE:
+                    cells_horizontal = [
+                        player_field.field[y][x + i] for i in range(size)
+                    ]
+                    if not any(cell in invalid_cells for cell in cells_horizontal):
+                        for i in range(size):
+                            if cells_horizontal[i] not in DO_NOT_ATTACK_CELLS:
+                                self.heat_map[y][x + i] += 1
 
-                for i in range(size):
-                    if player_field.field[y][x + i] not in [
-                        CellState.DESTROYED,
-                        CellState.MISS,
-                        CellState.NO_SHIP,
-                    ]:
-                        continue
-
-                    can_fit_horizontal = False
-                    break
-
-                if can_fit_horizontal:
-                    for i in range(size):
-                        if player_field.field[y][x + i] in DO_NOT_ATTACK_CELLS:
-                            continue
-
-                        self.heat_map[y][x + i] += 1
-
-                can_fit_vertical: bool = True
-                if y + size > FIELD_SIZE:
-                    continue
-
-                for i in range(size):
-                    if player_field.field[y + i][x] not in [
-                        CellState.DESTROYED,
-                        CellState.MISS,
-                        CellState.NO_SHIP,
-                    ]:
-                        continue
-
-                    can_fit_vertical = False
-                    break
-
-                if can_fit_vertical:
-                    for i in range(size):
-                        if player_field.field[y + i][x] in DO_NOT_ATTACK_CELLS:
-                            continue
-
-                        self.heat_map[y + i][x] += 1
+                if y + size <= FIELD_SIZE:
+                    cells_vertical = [player_field.field[y + i][x] for i in range(size)]
+                    if not any(cell in invalid_cells for cell in cells_vertical):
+                        for i in range(size):
+                            if cells_vertical[i] not in DO_NOT_ATTACK_CELLS:
+                                self.heat_map[y + i][x] += 1
 
     def process_attack_result(
         self, x: int, y: int, result: Optional[CellState], player_field: GameField
