@@ -219,7 +219,6 @@ class PlacementMenu(tk.Frame):
 
         ttk.Separator(self, orient=tk.HORIZONTAL).pack(fill=tk.X, pady=5)
 
-        # Алгоритм атаки бота
         bot_attack_frame: tk.Frame = tk.Frame(self, bg=Colors.MENU_BG.value)
         bot_attack_frame.pack(fill=tk.X, padx=10, pady=5)
 
@@ -269,7 +268,6 @@ class PlacementMenu(tk.Frame):
         """Обновляет список кораблей для размещения"""
         self.ships_listbox.delete(0, tk.END)
 
-        # Подсчитываем корабли
         ships_count: Dict[int, int] = {1: 0, 2: 0, 3: 0, 4: 0}
         for ship in self.game_logic.player_ships_to_place:
             if ship.x is not None:
