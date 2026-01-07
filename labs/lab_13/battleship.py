@@ -3,7 +3,7 @@ from enum import Enum
 from tkinter import messagebox
 from typing import Dict, Optional, Tuple
 
-from config import FIELD_SIZE, AttackAlgorithm, CellState, Colors, GUISize
+from config import AttackAlgorithm, CellState, Colors, GUISize
 from field_canvas import FieldCanvas
 from game_logic import GameLogic
 from main_menu import MainMenu
@@ -196,6 +196,7 @@ class Battleship(tk.Tk):
         if self.current_state != GameState.PLACEMENT:
             return
 
+        assert self.placement_menu is not None
         selected_ship: Optional[Ship] = self.placement_menu.get_selected_ship()
         if not selected_ship:
             return
@@ -211,6 +212,7 @@ class Battleship(tk.Tk):
         if self.current_state != GameState.PLACEMENT:
             return
 
+        assert self.placement_menu is not None
         selected_ship: Optional[Ship] = self.placement_menu.get_selected_ship()
         if not selected_ship:
             return
@@ -218,6 +220,7 @@ class Battleship(tk.Tk):
         valid: bool = self.game_logic.player_field.is_valid_position(
             selected_ship, x, y
         )
+        assert self.player_canvas is not None
         self.player_canvas.draw_ship_preview(selected_ship, x, y, valid)
         self.preview_position = (x, y)
 
@@ -225,6 +228,7 @@ class Battleship(tk.Tk):
         if self.current_state != GameState.PLACEMENT:
             return
 
+        assert self.placement_menu is not None
         selected_ship: Optional[Ship] = self.placement_menu.get_selected_ship()
         if not selected_ship:
             return
@@ -237,6 +241,7 @@ class Battleship(tk.Tk):
         valid: bool = self.game_logic.player_field.is_valid_position(
             selected_ship, x, y
         )
+        assert self.player_canvas is not None
         self.player_canvas.draw_ship_preview(selected_ship, x, y, valid)
 
     def _on_middle_click(self, event: tk.Event) -> None:
@@ -250,7 +255,7 @@ class Battleship(tk.Tk):
         x: int = event.x // cell_size
         y: int = event.y // cell_size
 
-        if FIELD_SIZE <= x < 0 and FIELD_SIZE <= y < 0:
+        if not FieldCanvas.in_field(x, y):
             return
 
         ship: Optional[Ship] = self.game_logic.player_field.get_ship_at(x, y)
@@ -258,11 +263,13 @@ class Battleship(tk.Tk):
             return
 
         self.game_logic.remove_player_ship(ship)
+        assert self.placement_menu is not None
         self.placement_menu.update_ships_list()
         self._update_display()
         self._check_ready_button()
 
     def _check_ready_button(self) -> None:
+        assert self.ready_button is not None
         if self.game_logic.all_player_ships_placed():
             self.ready_button.config(state=tk.NORMAL, bg=Colors.BTN_READY.value)
         else:
@@ -275,6 +282,7 @@ class Battleship(tk.Tk):
             )
             return
 
+        assert self.placement_menu is not None
         attack_algorithm: AttackAlgorithm = (
             self.placement_menu.get_bot_attack_algorithm()
         )
@@ -289,20 +297,14 @@ class Battleship(tk.Tk):
     def _start_game_screen(self) -> None:
         self.current_state = GameState.GAME
 
-        if not self.placement_menu:
-            return
-
+        assert self.placement_menu is not None
         self.placement_menu.destroy()
         self.placement_menu = None
 
-        if not self.ready_button:
-            return
-
+        assert self.ready_button is not None
         self.ready_button.config(state=tk.DISABLED)
 
-        if not self.bot_canvas:
-            return
-
+        assert self.bot_canvas is not None
         self.bot_canvas.click_callback = self._on_bot_field_click
 
         self._update_display()
@@ -319,7 +321,7 @@ class Battleship(tk.Tk):
 
         result: Optional[CellState] = self.game_logic.player_attack(x, y)
 
-        if result is None:
+        if not result:
             return
 
         self._update_display()
@@ -386,7 +388,9 @@ class Battleship(tk.Tk):
             f"{bot_stats['total_ships']} кораблей "
         )
 
+        assert self.player_stats_label is not None
         self.player_stats_label.config(text=player_text)
+        assert self.bot_stats_label is not None
         self.bot_stats_label.config(text=bot_text)
 
     def _show_game_over(self) -> None:
