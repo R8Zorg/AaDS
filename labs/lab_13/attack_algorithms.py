@@ -153,13 +153,14 @@ class AttackAlgorithms:
                 if player_field.field[y][x] != CellState.HIT:
                     continue
 
-                for dx, dy in DIRECTIONS:
-                    nx, ny = x + dx, y + dy
+                for offset_x, offset_y in DIRECTIONS:
+                    next_x, next_y = x + offset_x, y + offset_y
                     if (
-                        FieldCanvas.in_field(nx, ny)
-                        and player_field.field[ny][nx] not in DO_NOT_ATTACK_CELLS
+                        FieldCanvas.in_field(next_x, next_y)
+                        and player_field.field[next_y][next_x]
+                        not in DO_NOT_ATTACK_CELLS
                     ):
-                        self.heat_map[ny][nx] += 10
+                        self.heat_map[next_y][next_x] += 10
 
         ship_counts = {
             size: sum(1 for s in self.found_ship_sizes if s == size)
@@ -177,15 +178,19 @@ class AttackAlgorithms:
                     cells = [player_field.field[y][x + i] for i in range(size)]
                     if not any(cell in INVALID_CELLS for cell in cells):
                         for i in range(size):
-                            if cells[i] not in DO_NOT_ATTACK_CELLS:
-                                self.heat_map[y][x + i] += 1
+                            if cells[i] in DO_NOT_ATTACK_CELLS:
+                                continue
+
+                            self.heat_map[y][x + i] += 1
 
                 if y + size <= FIELD_SIZE:
                     cells = [player_field.field[y + i][x] for i in range(size)]
                     if not any(cell in INVALID_CELLS for cell in cells):
                         for i in range(size):
-                            if cells[i] not in DO_NOT_ATTACK_CELLS:
-                                self.heat_map[y + i][x] += 1
+                            if cells[i] in DO_NOT_ATTACK_CELLS:
+                                continue
+
+                            self.heat_map[y + i][x] += 1
 
     def process_attack_result(
         self, x: int, y: int, result: Optional[CellState], player_field: GameField
@@ -196,10 +201,11 @@ class AttackAlgorithms:
 
             if len(self.target_ship) == 1:
                 self.potential_targets = [
-                    (x + dx, y + dy)
-                    for dx, dy in DIRECTIONS
-                    if FieldCanvas.in_field(x + dx, y + dy)
-                    and player_field.field[y + dy][x + dx] not in DO_NOT_ATTACK_CELLS
+                    (x + offset_x, y + offset_y)
+                    for offset_x, offset_y in DIRECTIONS
+                    if FieldCanvas.in_field(x + offset_x, y + offset_y)
+                    and player_field.field[y + offset_y][x + offset_x]
+                    not in DO_NOT_ATTACK_CELLS
                 ]
             else:
                 self.ship_orientation = (
@@ -227,19 +233,19 @@ class AttackAlgorithms:
             min_x = min(coord[0] for coord in self.target_ship)
             max_x = max(coord[0] for coord in self.target_ship)
 
-            for nx, check_x in [
+            for next_x, check_x in [
                 (min_x - 1, min_x > 0),
                 (max_x + 1, max_x < FIELD_SIZE - 1),
             ]:
-                if check_x and player_field.field[y][nx] not in DO_NOT_ATTACK_CELLS:
-                    self.potential_targets.append((nx, y))
+                if check_x and player_field.field[y][next_x] not in DO_NOT_ATTACK_CELLS:
+                    self.potential_targets.append((next_x, y))
         else:
             min_y = min(coord[1] for coord in self.target_ship)
             max_y = max(coord[1] for coord in self.target_ship)
 
-            for ny, check_y in [
+            for next_y, check_y in [
                 (min_y - 1, min_y > 0),
                 (max_y + 1, max_y < FIELD_SIZE - 1),
             ]:
-                if check_y and player_field.field[ny][x] not in DO_NOT_ATTACK_CELLS:
-                    self.potential_targets.append((x, ny))
+                if check_y and player_field.field[next_y][x] not in DO_NOT_ATTACK_CELLS:
+                    self.potential_targets.append((x, next_y))
