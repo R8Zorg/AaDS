@@ -20,7 +20,7 @@ class FieldCanvas(tk.Canvas):
             height=canvas_size,
             bg=Colors.BG.value,
             highlightthickness=1,
-            highlightbackground="#CCCCCC",
+            highlightbackground=Colors.LINE.value,
         )
 
         self.is_player: bool = is_player
@@ -44,7 +44,7 @@ class FieldCanvas(tk.Canvas):
                 0,
                 i * cell_size,
                 FIELD_SIZE * cell_size,
-                fill="#CCCCCC",
+                fill=Colors.LINE.value,
                 width=1,
             )
             self.create_line(
@@ -52,7 +52,7 @@ class FieldCanvas(tk.Canvas):
                 i * cell_size,
                 FIELD_SIZE * cell_size,
                 i * cell_size,
-                fill="#CCCCCC",
+                fill=Colors.LINE.value,
                 width=1,
             )
 
@@ -108,22 +108,26 @@ class FieldCanvas(tk.Canvas):
                     for dx in range(-1, 2):
                         for dy in range(-1, 2):
                             nx, ny = x + dx, y + dy
-                            if 0 <= nx < FIELD_SIZE and 0 <= ny < FIELD_SIZE:
-                                if field[ny][nx] == CellState.NO_SHIP:
-                                    x1: int = nx * cell_size + 1
-                                    y1: int = ny * cell_size + 1
-                                    x2: int = x1 + cell_size - 2
-                                    y2: int = y1 + cell_size - 2
+                            if not self.in_field(nx, ny):
+                                continue
 
-                                    self.create_rectangle(
-                                        x1,
-                                        y1,
-                                        x2,
-                                        y2,
-                                        fill=Colors.BLACK_MARK.value,
-                                        outline=Colors.BLACK_MARK.value,
-                                        tags="cell",
-                                    )
+                            if field[ny][nx] != CellState.NO_SHIP:
+                                continue
+
+                            x1: int = nx * cell_size + 1
+                            y1: int = ny * cell_size + 1
+                            x2: int = x1 + cell_size - 2
+                            y2: int = y1 + cell_size - 2
+
+                            self.create_rectangle(
+                                x1,
+                                y1,
+                                x2,
+                                y2,
+                                fill=Colors.BLACK_MARK.value,
+                                outline=Colors.BLACK_MARK.value,
+                                tags="cell",
+                            )
 
     def draw_ship_preview(
         self, ship: Ship, x: Optional[int], y: Optional[int], valid: bool = True
@@ -134,7 +138,7 @@ class FieldCanvas(tk.Canvas):
             return
 
         cell_size: int = GUISize.CELL_SIZE.value
-        color: str = Colors.SELECTED.value if valid else "#FF5252"
+        color: str = Colors.SELECTED.value if valid else Colors.INVALID.value
 
         old_x, old_y = ship.x, ship.y
         ship.x, ship.y = x, y
@@ -142,66 +146,79 @@ class FieldCanvas(tk.Canvas):
         ship.x, ship.y = old_x, old_y
 
         for cx, cy in coords:
-            if 0 <= cx < FIELD_SIZE and 0 <= cy < FIELD_SIZE:
-                x1: int = cx * cell_size + 1
-                y1: int = cy * cell_size + 1
-                x2: int = x1 + cell_size - 2
-                y2: int = y1 + cell_size - 2
+            if not self.in_field(cx, cy):
+                continue
 
-                self.create_rectangle(
-                    x1,
-                    y1,
-                    x2,
-                    y2,
-                    fill=color,
-                    outline=color,
-                    tags="preview",
-                    stipple="gray50",
-                )
+            x1: int = cx * cell_size + 1
+            y1: int = cy * cell_size + 1
+            x2: int = x1 + cell_size - 2
+            y2: int = y1 + cell_size - 2
+
+            self.create_rectangle(
+                x1,
+                y1,
+                x2,
+                y2,
+                fill=color,
+                outline=color,
+                tags="preview",
+                stipple="gray50",
+            )
 
     def highlight_cell(self, x: int, y: int) -> None:
         self.delete("highlight")
+        if x is None and y is None:
+            return
 
-        if x is not None and y is not None:
-            if 0 <= x < FIELD_SIZE and 0 <= y < FIELD_SIZE:
-                cell_size: int = GUISize.CELL_SIZE.value
-                x1: int = x * cell_size + 1
-                y1: int = y * cell_size + 1
-                x2: int = x1 + cell_size - 2
-                y2: int = y1 + cell_size - 2
+        if not self.in_field(x, y):
+            return
 
-                self.create_rectangle(
-                    x1,
-                    y1,
-                    x2,
-                    y2,
-                    fill="",
-                    outline=Colors.HOVER.value,
-                    width=3,
-                    tags="highlight",
-                )
+        cell_size: int = GUISize.CELL_SIZE.value
+        x1: int = x * cell_size + 1
+        y1: int = y * cell_size + 1
+        x2: int = x1 + cell_size - 2
+        y2: int = y1 + cell_size - 2
+
+        self.create_rectangle(
+            x1,
+            y1,
+            x2,
+            y2,
+            fill="",
+            outline=Colors.HOVER.value,
+            width=3,
+            tags="highlight",
+        )
 
     def _on_click(self, event: tk.Event) -> None:
         cell_size: int = GUISize.CELL_SIZE.value
         x: int = event.x // cell_size
         y: int = event.y // cell_size
 
-        if 0 <= x < FIELD_SIZE and 0 <= y < FIELD_SIZE:
-            if self.click_callback:
-                self.click_callback(x, y)
+        if not self.in_field(x, y):
+            return
+
+        if not self.click_callback:
+            return
+
+        self.click_callback(x, y)
 
     def _on_motion(self, event: tk.Event) -> None:
         cell_size: int = GUISize.CELL_SIZE.value
         x: int = event.x // cell_size
         y: int = event.y // cell_size
 
-        if 0 <= x < FIELD_SIZE and 0 <= y < FIELD_SIZE:
-            if self.hover_cell != (x, y):
-                self.hover_cell = (x, y)
-                self.highlight_cell(x, y)
+        if self.in_field(x, y):
+            if self.hover_cell == (x, y):
+                return
 
-                if self.hover_callback:
-                    self.hover_callback(x, y)
+            self.hover_cell = (x, y)
+            self.highlight_cell(x, y)
+
+            if not self.hover_callback:
+                return
+
+            self.hover_callback(x, y)
         else:
             self.hover_cell = None
             self.delete("highlight")
@@ -210,3 +227,7 @@ class FieldCanvas(tk.Canvas):
         self.hover_cell = None
         self.delete("highlight")
         self.delete("preview")
+
+    @staticmethod
+    def in_field(x: int, y: int) -> bool:
+        return 0 <= x < FIELD_SIZE and 0 <= y < FIELD_SIZE
