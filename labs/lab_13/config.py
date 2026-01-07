@@ -44,7 +44,7 @@ class GUISize(Enum):
 
 class PlacementAlgorithm(Enum):
     RANDOM = "random"
-    ALGORITHM_1 = "algorithm1"
+    ALGORITHM = "algorithm"
 
 
 class AttackAlgorithm(Enum):

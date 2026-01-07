@@ -210,7 +210,7 @@ class PlacementMenu(tk.Frame):
             bot_placement_frame,
             text="По алгоритму",
             variable=self.bot_placement_var,
-            value=PlacementAlgorithm.ALGORITHM_1.value,
+            value=PlacementAlgorithm.ALGORITHM.value,
             command=self._on_bot_placement_change,
             bg=Colors.MENU_BG.value,
             font=("Arial", 9),
@@ -335,7 +335,7 @@ class PlacementMenu(tk.Frame):
         self.update_display()
 
     def _auto_place_algoythm(self) -> None:
-        self.game_logic.auto_place_player_ships(PlacementAlgorithm.ALGORITHM_1)
+        self.game_logic.auto_place_player_ships(PlacementAlgorithm.ALGORITHM)
         self.selected_ship = None
         self.update_ships_list()
         self.check_ready_button()

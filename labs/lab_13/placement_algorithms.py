@@ -146,7 +146,7 @@ class PlacementAlgorithms:
     def place_ships(field: GameField, algorithm_type: PlacementAlgorithm) -> List[Ship]:
         if algorithm_type == PlacementAlgorithm.RANDOM:
             return PlacementAlgorithms.random_placement(field)
-        elif algorithm_type == PlacementAlgorithm.ALGORITHM_1:
+        elif algorithm_type == PlacementAlgorithm.ALGORITHM:
             return PlacementAlgorithms.algorithm_placement(field)
         else:
             return PlacementAlgorithms.random_placement(field)
