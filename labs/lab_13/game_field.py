@@ -25,18 +25,18 @@ class GameField:
         coords: list[tuple[int, int]] = ship.get_coordinates()
         ship.x, ship.y = None, None
 
-        for cx, cy in coords:
-            if not FieldCanvas.in_field(cx, cy):
+        for cell_x, cell_y in coords:
+            if not FieldCanvas.in_field(cell_x, cell_y):
                 return False
 
-        for cx, cy in coords:
-            for dx in range(-1, 2):
-                for dy in range(-1, 2):
-                    nx, ny = cx + dx, cy + dy
-                    if not FieldCanvas.in_field(nx, ny):
+        for cell_x, cell_y in coords:
+            for offset_x in range(-1, 2):
+                for offset_y in range(-1, 2):
+                    next_x, next_y = cell_x + offset_x, cell_y + offset_y
+                    if not FieldCanvas.in_field(next_x, next_y):
                         continue
 
-                    if (nx, ny) in self.ship_cells:
+                    if (next_x, next_y) in self.ship_cells:
                         return False
         return True
 
@@ -93,17 +93,17 @@ class GameField:
 
     def mark_surrounding_cells(self, ship: Ship) -> None:
         coords: List[Tuple[int, int]] = ship.get_coordinates()
-        for cx, cy in coords:
-            for dx in range(-1, 2):
-                for dy in range(-1, 2):
-                    nx, ny = cx + dx, cy + dy
-                    if not FieldCanvas.in_field(nx, ny):
+        for cell_x, cell_y in coords:
+            for offset_x in range(-1, 2):
+                for offset_y in range(-1, 2):
+                    next_x, next_y = cell_x + offset_x, cell_y + offset_y
+                    if not FieldCanvas.in_field(next_x, next_y):
                         continue
 
-                    if self.field[ny][nx] != CellState.EMPTY:
+                    if self.field[next_y][next_x] != CellState.EMPTY:
                         continue
 
-                    self.field[ny][nx] = CellState.NO_SHIP
+                    self.field[next_y][next_x] = CellState.NO_SHIP
 
     def get_all_ship_coordinates(self) -> Set[Tuple[int, int]]:
         return set(self.ship_cells.keys())
