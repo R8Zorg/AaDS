@@ -50,7 +50,7 @@ def writeln(line: str) -> None:
     output_values = []
     for variable_name in variables_to_write:
         value = get_variable_value(variable_name)
-        output_values.append(f"{variable_name}={value}")
+        output_values.append(f"{variable_name} = {value}")
     print(", ".join(output_values))
 
 
@@ -90,6 +90,9 @@ def parse_and_execute(filename):
         line = line.strip()
         if not line:
             continue
+        if line.startswith("#"):
+            print(line[2:])
+            continue
         if line.startswith("readln"):
             readln(line[6:].strip())
         elif line.startswith("writeln"):
@@ -102,10 +105,10 @@ def parse_and_execute(filename):
 
 if __name__ == "__main__":
     # filename = input("введите полное имя файла (пример: input.txt): ")
-    filename = "input.txt"
-    parse_and_execute(filename)
-    # import sys
-    # if len(sys.argv) < 2:
-    #     print("Использование: python main.py <полное название файла с кодом>")
-    # else:
-    #     parse_and_execute(sys.argv[1])
+    # filename = "input.txt"
+    # parse_and_execute(filename)
+    import sys
+    if len(sys.argv) < 2:
+        print("Использование: python main.py <полное название файла с кодом>")
+    else:
+        parse_and_execute(sys.argv[1])
