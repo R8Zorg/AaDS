@@ -142,10 +142,9 @@ class FieldCanvas(tk.Canvas):
         cell_size: int = GUISize.CELL_SIZE.value
         color: str = Colors.SELECTED.value if valid else Colors.INVALID.value
 
-        old_x, old_y = ship.x, ship.y
         ship.x, ship.y = x, y
         coords: List[Tuple[int, int]] = ship.get_coordinates()
-        ship.x, ship.y = old_x, old_y
+        ship.x, ship.y = None, None
 
         for cell_x, cell_y in coords:
             if not self.in_field(cell_x, cell_y):
@@ -169,8 +168,6 @@ class FieldCanvas(tk.Canvas):
 
     def highlight_cell(self, x: int, y: int) -> None:
         self.delete("highlight")
-        if x is None and y is None:
-            return
 
         if not self.in_field(x, y):
             return
