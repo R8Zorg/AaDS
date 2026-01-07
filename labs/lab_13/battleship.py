@@ -136,7 +136,6 @@ class Battleship(tk.Tk):
         self.bot_canvas = FieldCanvas(bot_frame, is_player=False)
         self.bot_canvas.pack()
 
-        # Кнопки
         buttons_frame: tk.Frame = tk.Frame(game_container, bg=Colors.BG.value)
         buttons_frame.pack()
 
@@ -183,85 +182,85 @@ class Battleship(tk.Tk):
         )
         self.menu_button.pack(side=tk.LEFT, padx=5)
 
-        # Привязываем события клавиатуры
         self.bind("<Button-3>", self._on_right_click)
         self.bind("<Button-2>", self._on_middle_click)
 
-        # Обновляем меню
         self.placement_menu.update_ships_list()
 
-        # Обновляем отображение
         self._update_display()
 
         self.geometry("")
         self._center_window()
 
     def _on_player_field_click(self, x: int, y: int) -> None:
-        """Обработчик клика по полю игрока"""
         if self.current_state != GameState.PLACEMENT:
             return
 
-        # Получаем выбранный корабль
         selected_ship: Optional[Ship] = self.placement_menu.get_selected_ship()
+        if not selected_ship:
+            return
 
-        if selected_ship:
-            # Пытаемся разместить корабль
-            if self.game_logic.place_player_ship(selected_ship, x, y):
-                # После размещения автоматически выбираем следующий корабль
-                self.placement_menu.update_ships_list()
-                self._update_display()
-                self._check_ready_button()
+        if not self.game_logic.place_player_ship(selected_ship, x, y):
+            return
+
+        self.placement_menu.update_ships_list()
+        self._update_display()
+        self._check_ready_button()
 
     def _on_player_field_hover(self, x: int, y: int) -> None:
-        """Обработчик наведения на поле игрока"""
         if self.current_state != GameState.PLACEMENT:
             return
 
         selected_ship: Optional[Ship] = self.placement_menu.get_selected_ship()
+        if not selected_ship:
+            return
 
-        if selected_ship:
-            # Показываем предпросмотр
-            valid: bool = self.game_logic.player_field.is_valid_position(
-                selected_ship, x, y
-            )
-            self.player_canvas.draw_ship_preview(selected_ship, x, y, valid)
-            self.preview_position = (x, y)
+        valid: bool = self.game_logic.player_field.is_valid_position(
+            selected_ship, x, y
+        )
+        self.player_canvas.draw_ship_preview(selected_ship, x, y, valid)
+        self.preview_position = (x, y)
 
     def _on_right_click(self, event: tk.Event) -> None:
-        """Обработчик правого клика (поворот корабля)"""
         if self.current_state != GameState.PLACEMENT:
             return
 
         selected_ship: Optional[Ship] = self.placement_menu.get_selected_ship()
+        if not selected_ship:
+            return
 
-        if selected_ship:
-            selected_ship.rotate()
-            # Обновляем предпросмотр
-            if self.preview_position:
-                x, y = self.preview_position
-                valid: bool = self.game_logic.player_field.is_valid_position(
-                    selected_ship, x, y
-                )
-                self.player_canvas.draw_ship_preview(selected_ship, x, y, valid)
+        selected_ship.rotate()
+        if not self.preview_position:
+            return
+
+        x, y = self.preview_position
+        valid: bool = self.game_logic.player_field.is_valid_position(
+            selected_ship, x, y
+        )
+        self.player_canvas.draw_ship_preview(selected_ship, x, y, valid)
 
     def _on_middle_click(self, event: tk.Event) -> None:
         if self.current_state != GameState.PLACEMENT:
             return
 
-        # Определяем координаты клика
-        widget: tk.Widget = event.widget
-        if widget == self.player_canvas:
-            cell_size: int = GUISize.CELL_SIZE.value
-            x: int = event.x // cell_size
-            y: int = event.y // cell_size
+        if event.widget != self.player_canvas:
+            return
 
-            if 0 <= x < FIELD_SIZE and 0 <= y < FIELD_SIZE:
-                ship: Optional[Ship] = self.game_logic.player_field.get_ship_at(x, y)
-                if ship:
-                    self.game_logic.remove_player_ship(ship)
-                    self.placement_menu.update_ships_list()
-                    self._update_display()
-                    self._check_ready_button()
+        cell_size: int = GUISize.CELL_SIZE.value
+        x: int = event.x // cell_size
+        y: int = event.y // cell_size
+
+        if FIELD_SIZE <= x < 0 and FIELD_SIZE <= y < 0:
+            return
+
+        ship: Optional[Ship] = self.game_logic.player_field.get_ship_at(x, y)
+        if not ship:
+            return
+
+        self.game_logic.remove_player_ship(ship)
+        self.placement_menu.update_ships_list()
+        self._update_display()
+        self._check_ready_button()
 
     def _check_ready_button(self) -> None:
         if self.game_logic.all_player_ships_placed():
@@ -282,21 +281,29 @@ class Battleship(tk.Tk):
         self.placement_menu.update_show_enemy_mark()
         self.placement_menu.update_highlight_mark()
 
-        if self.game_logic.start_game(attack_algorithm):
-            self._start_game_screen()
+        if not self.game_logic.start_game(attack_algorithm):
+            return
+
+        self._start_game_screen()
 
     def _start_game_screen(self) -> None:
         self.current_state = GameState.GAME
 
-        if self.placement_menu:
-            self.placement_menu.destroy()
-            self.placement_menu = None
+        if not self.placement_menu:
+            return
 
-        if self.ready_button:
-            self.ready_button.config(state=tk.DISABLED)
+        self.placement_menu.destroy()
+        self.placement_menu = None
 
-        if self.bot_canvas:
-            self.bot_canvas.click_callback = self._on_bot_field_click
+        if not self.ready_button:
+            return
+
+        self.ready_button.config(state=tk.DISABLED)
+
+        if not self.bot_canvas:
+            return
+
+        self.bot_canvas.click_callback = self._on_bot_field_click
 
         self._update_display()
 
@@ -332,16 +339,20 @@ class Battleship(tk.Tk):
             self.game_logic.bot_attack()
         )
 
-        if result:
-            self._update_display()
+        if not result:
+            return
 
-            if self.game_logic.game_over:
-                self._show_game_over()
-                return
+        self._update_display()
 
-            coords, attack_result = result
-            if attack_result in [CellState.HIT, CellState.DESTROYED]:
-                self.after(500, self._bot_turn)
+        if self.game_logic.game_over:
+            self._show_game_over()
+            return
+
+        coords, attack_result = result
+        if attack_result not in [CellState.HIT, CellState.DESTROYED]:
+            return
+
+        self.after(500, self._bot_turn)
 
     def _update_display(self) -> None:
         if not self.player_canvas or not self.bot_canvas:
@@ -359,29 +370,31 @@ class Battleship(tk.Tk):
             highlight_surrounding=self.game_logic.highlight_surrounding,
         )
 
-        if self.player_stats_label and self.bot_stats_label:
-            player_stats: Dict[str, int] = self.game_logic.get_player_stats()
-            bot_stats: Dict[str, int] = self.game_logic.get_bot_stats()
+        if not self.player_stats_label and not self.bot_stats_label:
+            return
 
-            player_text: str = (
-                f"Потоплено: {player_stats['destroyed_ships']}/"
-                f"{player_stats['total_ships']} кораблей "
-            )
+        player_stats: Dict[str, int] = self.game_logic.get_player_stats()
+        bot_stats: Dict[str, int] = self.game_logic.get_bot_stats()
 
-            bot_text: str = (
-                f"Потоплено: {bot_stats['destroyed_ships']}/"
-                f"{bot_stats['total_ships']} кораблей "
-            )
+        player_text: str = (
+            f"Потоплено: {player_stats['destroyed_ships']}/"
+            f"{player_stats['total_ships']} кораблей "
+        )
 
-            self.player_stats_label.config(text=player_text)
-            self.bot_stats_label.config(text=bot_text)
+        bot_text: str = (
+            f"Потоплено: {bot_stats['destroyed_ships']}/"
+            f"{bot_stats['total_ships']} кораблей "
+        )
+
+        self.player_stats_label.config(text=player_text)
+        self.bot_stats_label.config(text=bot_text)
 
     def _show_game_over(self) -> None:
         if self.game_logic.winner == "player":
-            message: str = "Поздравляем! Вы победили!"
+            message: str = "Вы победили!"
             title: str = "Победа!"
         else:
-            message = "Вы проиграли. Попробуйте ещё раз!"
+            message = "Вы проиграли."
             title = "Поражение"
 
         messagebox.showinfo(title, message)

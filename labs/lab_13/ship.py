@@ -34,8 +34,10 @@ class Ship:
         return self.hits >= self.size
 
     def hit(self) -> None:
-        if self.hits < self.size:
-            self.hits += 1
+        if self.hits >= self.size:
+            return
+
+        self.hits += 1
 
     def reset_hits(self) -> None:
         self.hits = 0

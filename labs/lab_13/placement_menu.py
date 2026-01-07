@@ -1,10 +1,18 @@
 import tkinter as tk
+from enum import Enum
 from tkinter import ttk
 from typing import Callable, Dict, Optional, Tuple
 
 from config import AttackAlgorithm, Colors, PlacementAlgorithm
 from game_logic import GameLogic
 from ship import Ship
+
+
+class ShipNames(Enum):
+    LINKOR = "Линкор"
+    CRUISER = "Крейсер"
+    DESTROYER = "Эсминец"
+    MOTORBOAT = "Катер"
 
 
 class PlacementMenu(tk.Frame):
@@ -25,6 +33,12 @@ class PlacementMenu(tk.Frame):
         self.selected_ship: Optional[Ship] = None
         self.check_ready_button: Callable[[], None] = check_ready_button
         self.update_display: Callable[[], None] = update_display
+        self.SHIP_NAMES: Dict[int, str] = {
+            4: ShipNames.LINKOR.value,
+            3: ShipNames.CRUISER.value,
+            2: ShipNames.DESTROYER.value,
+            1: ShipNames.MOTORBOAT.value,
+        }
 
         self._create_widgets()
 
@@ -64,10 +78,10 @@ class PlacementMenu(tk.Frame):
         instructions_text.insert(
             "1.0",
             "• Расставьте все корабли\n"
-            "• 1 линкор (4 клетки)\n"
-            "• 2 крейсера (3 клетки)\n"
-            "• 3 эсминца (2 клетки)\n"
-            "• 4 катера (1 клетка)\n\n"
+            "• 1 Линкор (4 клетки)\n"
+            "• 2 Крейсера (3 клетки)\n"
+            "• 3 Эсминца (2 клетки)\n"
+            "• 4 Катера (1 клетка)\n\n"
             "Управление:\n"
             "• ЛКМ - разместить корабль\n"
             "• ПКМ - повернуть корабль\n"
@@ -258,46 +272,36 @@ class PlacementMenu(tk.Frame):
         # Подсчитываем корабли
         ships_count: Dict[int, int] = {1: 0, 2: 0, 3: 0, 4: 0}
         for ship in self.game_logic.player_ships_to_place:
-            if ship.x is None:
-                ships_count[ship.size] += 1
+            if ship.x is not None:
+                continue
 
-        ship_names: Dict[int, str] = {
-            4: "Линкор",
-            3: "Крейсер",
-            2: "Эсминец",
-            1: "Катер",
-        }
+            ships_count[ship.size] += 1
 
         for size in [4, 3, 2, 1]:
             count: int = ships_count[size]
-            if count > 0:
-                text: str = f"{ship_names[size]} (кол-во клеток - {size}): {count} шт."
-                self.ships_listbox.insert(tk.END, text)
+            if count <= 0:
+                continue
 
-        # Автоматически выбираем первый доступный корабль
+            text: str = f"{self.SHIP_NAMES[size]} (кол-во клеток - {size}): {count} шт."
+            self.ships_listbox.insert(tk.END, text)
+
         self._auto_select_ship()
 
     def _auto_select_ship(self) -> None:
-        """Автоматически выбирает первый доступный корабль"""
-        # Ищем первый неразмещённый корабль (самый большой)
         for size in [4, 3, 2, 1]:
             for ship in self.game_logic.player_ships_to_place:
-                if ship.size == size and ship.x is None:
-                    self.selected_ship = ship
-                    # Выделяем в списке
-                    items: Tuple = self.ships_listbox.get(0, tk.END)
-                    ship_names: Dict[int, str] = {
-                        4: "Линкор",
-                        3: "Крейсер",
-                        2: "Эсминец",
-                        1: "Катер",
-                    }
-                    for i, item in enumerate(items):
-                        if ship_names[size] in item:
-                            self.ships_listbox.selection_clear(0, tk.END)
-                            self.ships_listbox.selection_set(i)
-                            break
-                    return
+                if ship.size != size or ship.x is not None:
+                    continue
+                self.selected_ship = ship
+                items: Tuple = self.ships_listbox.get(0, tk.END)
+                for i, item in enumerate(items):
+                    if self.SHIP_NAMES[size] not in item:
+                        continue
+
+                    self.ships_listbox.selection_clear(0, tk.END)
+                    self.ships_listbox.selection_set(i)
+                    break
+                return
 
         self.selected_ship = None
 
@@ -310,19 +314,21 @@ class PlacementMenu(tk.Frame):
         items: Tuple = self.ships_listbox.get(0, tk.END)
         selected_text: str = items[index]
 
-        if "Линкор" in selected_text:
+        if ShipNames.LINKOR.value in selected_text:
             size: int = 4
-        elif "Крейсер" in selected_text:
+        elif ShipNames.CRUISER.value in selected_text:
             size = 3
-        elif "Эсминец" in selected_text:
+        elif ShipNames.DESTROYER.value in selected_text:
             size = 2
         else:
             size = 1
 
         for ship in self.game_logic.player_ships_to_place:
-            if ship.size == size and ship.x is None:
-                self.selected_ship = ship
-                break
+            if ship.size != size or ship.x is not None:
+                continue
+
+            self.selected_ship = ship
+            break
 
     def _auto_place_random(self) -> None:
         self.game_logic.auto_place_player_ships(PlacementAlgorithm.RANDOM)

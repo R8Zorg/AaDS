@@ -2,6 +2,7 @@ from typing import Dict, List, Optional, Set, Tuple
 
 from config import FIELD_SIZE, CellState
 from ship import Ship
+from field_canvas import FieldCanvas
 
 
 class GameField:
@@ -25,16 +26,18 @@ class GameField:
         ship.x, ship.y = None, None
 
         for cx, cy in coords:
-            if cx < 0 or cx >= FIELD_SIZE or cy < 0 or cy >= FIELD_SIZE:
+            if not FieldCanvas.in_field(cx, cy):
                 return False
 
         for cx, cy in coords:
             for dx in range(-1, 2):
                 for dy in range(-1, 2):
                     nx, ny = cx + dx, cy + dy
-                    if 0 <= nx < FIELD_SIZE and 0 <= ny < FIELD_SIZE:
-                        if (nx, ny) in self.ship_cells:
-                            return False
+                    if not FieldCanvas.in_field(nx, ny):
+                        continue
+
+                    if (nx, ny) in self.ship_cells:
+                        return False
         return True
 
     def place_ship(self, ship: Ship, x: int, y: int) -> bool:
@@ -53,13 +56,12 @@ class GameField:
         return True
 
     def remove_ship(self, ship: Ship) -> None:
-        # if ship not in self.ships:
-        #     return
-
         for coord in ship.get_coordinates():
-            if coord in self.ship_cells:
-                del self.ship_cells[coord]
-                self.field[coord[1]][coord[0]] = CellState.EMPTY
+            if coord not in self.ship_cells:
+                continue
+
+            del self.ship_cells[coord]
+            self.field[coord[1]][coord[0]] = CellState.EMPTY
         self.ships.remove(ship)
         ship.x, ship.y = None, None
 
@@ -95,9 +97,13 @@ class GameField:
             for dx in range(-1, 2):
                 for dy in range(-1, 2):
                     nx, ny = cx + dx, cy + dy
-                    if 0 <= nx < FIELD_SIZE and 0 <= ny < FIELD_SIZE:
-                        if self.field[ny][nx] == CellState.EMPTY:
-                            self.field[ny][nx] = CellState.NO_SHIP
+                    if not FieldCanvas.in_field(nx, ny):
+                        continue
+
+                    if self.field[ny][nx] != CellState.EMPTY:
+                        continue
+
+                    self.field[ny][nx] = CellState.NO_SHIP
 
     def get_all_ship_coordinates(self) -> Set[Tuple[int, int]]:
         return set(self.ship_cells.keys())

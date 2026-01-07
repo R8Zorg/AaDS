@@ -32,7 +32,7 @@ class MainMenu(tk.Frame):
             text="Игра с ботом",
             font=("Arial", 14, "italic"),
             bg=Colors.MENU_BG.value,
-            fg="#666666",
+            fg=Colors.FOREGROUND.value,
         )
         subtitle.pack(pady=(0, 30))
 
@@ -69,7 +69,7 @@ class MainMenu(tk.Frame):
         btn_start = tk.Button(
             center_frame,
             text="НАЧАТЬ ИГРУ",
-            command=self._on_start_click,
+            command=self.start_game_callback,
             bg=Colors.BTN_PRIMARY.value,
             fg="white",
             font=("Arial", 16, "bold"),
@@ -80,7 +80,3 @@ class MainMenu(tk.Frame):
             borderwidth=3,
         )
         btn_start.pack(pady=30)
-
-    def _on_start_click(self) -> None:
-        if self.start_game_callback:
-            self.start_game_callback()

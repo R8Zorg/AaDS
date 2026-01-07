@@ -109,7 +109,6 @@ class GameLogic:
         if result == CellState.MISS:
             self.player_turn = True
 
-        # Проверяем победу
         if self.player_field.is_all_ships_destroyed():
             self.game_over = True
             self.winner = "bot"
