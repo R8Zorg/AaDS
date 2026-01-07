@@ -16,8 +16,8 @@ class CellState(Enum):
 class Colors(Enum):
     EMPTY = "#E8F4F8"
     SHIP = "#4A90E2"
-    HIT = "#8B0000"
-    DESTROYED = "#FF6B6B"
+    HIT = "#FF8F00"
+    DESTROYED = "#EA4A4A"
     MISS = "#B0BEC5"
     HOVER = "#FFE082"
     SELECTED = "#FFA726"
