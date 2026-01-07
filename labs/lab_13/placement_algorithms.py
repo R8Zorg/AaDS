@@ -1,27 +1,9 @@
 import random
-from enum import Enum
 from typing import List
 
 from config import FIELD_SIZE, SHIPS, PlacementAlgorithm
 from game_field import GameField
 from ship import Ship
-
-"""
-1. Стороны: верх-низ или лево-право? (транспонирование базовой матрицы)
-2. Зеркалить?
-3. Если зеркалить, то по X или по Y?
-"""
-
-
-class PlacementPattern(Enum):
-    LEFT_VERTICAL = "left_vertical"
-    RIGHT_VERTICAL = "right_vertical"
-    TOP_HORIZONTAL = "top_horizontal"
-    BOTTOM_HORIZONTAL = "bottom_horizontal"
-    LEFT_VERTICAL_ALT = "left_vertical_alt"
-    RIGHT_VERTICAL_ALT = "right_vertical_alt"
-    TOP_HORIZONTAL_ALT = "top_horizontal_alt"
-    BOTTOM_HORIZONTAL_ALT = "bottom_horizontal_alt"
 
 
 class PlacementAlgorithms:
@@ -58,34 +40,14 @@ class PlacementAlgorithms:
     def algorithm_placement(field: GameField) -> List[Ship]:
         field.reset()
 
-        pattern: PlacementPattern = random.choice(list(PlacementPattern))
+        transpose = random.choice([True, False])
+        mirror = random.choice([True, False])
+        mirror_axis = random.choice(["x", "y"]) if mirror else None
 
         ships: List[Ship] = []
 
-        if pattern == PlacementPattern.LEFT_VERTICAL:
-            ships = PlacementAlgorithms._place_left_vertical(field)
-        elif pattern == PlacementPattern.RIGHT_VERTICAL:
-            ships = PlacementAlgorithms._place_right_vertical(field)
-        elif pattern == PlacementPattern.TOP_HORIZONTAL:
-            ships = PlacementAlgorithms._place_top_horizontal(field)
-        elif pattern == PlacementPattern.BOTTOM_HORIZONTAL:
-            ships = PlacementAlgorithms._place_bottom_horizontal(field)
-        elif pattern == PlacementPattern.LEFT_VERTICAL_ALT:
-            ships = PlacementAlgorithms._place_left_vertical_alt(field)
-        elif pattern == PlacementPattern.RIGHT_VERTICAL_ALT:
-            ships = PlacementAlgorithms._place_right_vertical_alt(field)
-        elif pattern == PlacementPattern.TOP_HORIZONTAL_ALT:
-            ships = PlacementAlgorithms._place_top_horizontal_alt(field)
-        elif pattern == PlacementPattern.BOTTOM_HORIZONTAL_ALT:
-            ships = PlacementAlgorithms._place_bottom_horizontal_alt(field)
-
-        return ships
-
-    @staticmethod
-    def _place_left_vertical(field: GameField) -> List[Ship]:
         """
-        Размещение по паттерну: линкор слева, корабли вертикально по краям
-        Базовая матрица:
+        Расстановка 1:
         1000000001
         1000000001
         1000000001
@@ -96,138 +58,8 @@ class PlacementAlgorithms:
         0000000000
         1000000001
         1000000001
-        """
-        ships: List[Ship] = []
 
-        ship4: Ship = Ship(4, is_horizontal=False)
-        if field.place_ship(ship4, 0, 0):
-            ships.append(ship4)
-
-        ship3_1: Ship = Ship(3, is_horizontal=False)
-        if field.place_ship(ship3_1, 9, 0):
-            ships.append(ship3_1)
-
-        ship3_2: Ship = Ship(3, is_horizontal=False)
-        if field.place_ship(ship3_2, 9, 4):
-            ships.append(ship3_2)
-
-        ship2_1: Ship = Ship(2, is_horizontal=False)
-        if field.place_ship(ship2_1, 0, 5):
-            ships.append(ship2_1)
-
-        ship2_2: Ship = Ship(2, is_horizontal=False)
-        if field.place_ship(ship2_2, 0, 8):
-            ships.append(ship2_2)
-
-        ship2_3: Ship = Ship(2, is_horizontal=False)
-        if field.place_ship(ship2_3, 9, 8):
-            ships.append(ship2_3)
-
-        ships.extend(PlacementAlgorithms._place_remaining_ships(field, 1, 4))
-
-        return ships
-
-    @staticmethod
-    def _place_right_vertical(field: GameField) -> List[Ship]:
-        ships: List[Ship] = []
-
-        ship4: Ship = Ship(4, is_horizontal=False)
-        if field.place_ship(ship4, 9, 0):
-            ships.append(ship4)
-
-        ship3_1: Ship = Ship(3, is_horizontal=False)
-        if field.place_ship(ship3_1, 0, 0):
-            ships.append(ship3_1)
-
-        ship3_2: Ship = Ship(3, is_horizontal=False)
-        if field.place_ship(ship3_2, 0, 4):
-            ships.append(ship3_2)
-
-        ship2_1: Ship = Ship(2, is_horizontal=False)
-        if field.place_ship(ship2_1, 9, 5):
-            ships.append(ship2_1)
-
-        ship2_2: Ship = Ship(2, is_horizontal=False)
-        if field.place_ship(ship2_2, 9, 8):
-            ships.append(ship2_2)
-
-        ship2_3: Ship = Ship(2, is_horizontal=False)
-        if field.place_ship(ship2_3, 0, 8):
-            ships.append(ship2_3)
-
-        ships.extend(PlacementAlgorithms._place_remaining_ships(field, 1, 4))
-
-        return ships
-
-    @staticmethod
-    def _place_top_horizontal(field: GameField) -> List[Ship]:
-        ships: List[Ship] = []
-
-        ship4: Ship = Ship(4, is_horizontal=True)
-        if field.place_ship(ship4, 0, 0):
-            ships.append(ship4)
-
-        ship3_1: Ship = Ship(3, is_horizontal=True)
-        if field.place_ship(ship3_1, 0, 9):
-            ships.append(ship3_1)
-
-        ship3_2: Ship = Ship(3, is_horizontal=True)
-        if field.place_ship(ship3_2, 4, 9):
-            ships.append(ship3_2)
-
-        ship2_1: Ship = Ship(2, is_horizontal=True)
-        if field.place_ship(ship2_1, 5, 0):
-            ships.append(ship2_1)
-
-        ship2_2: Ship = Ship(2, is_horizontal=True)
-        if field.place_ship(ship2_2, 8, 0):
-            ships.append(ship2_2)
-
-        ship2_3: Ship = Ship(2, is_horizontal=True)
-        if field.place_ship(ship2_3, 8, 9):
-            ships.append(ship2_3)
-
-        ships.extend(PlacementAlgorithms._place_remaining_ships(field, 1, 4))
-
-        return ships
-
-    @staticmethod
-    def _place_bottom_horizontal(field: GameField) -> List[Ship]:
-        """Линкор снизу"""
-        ships: List[Ship] = []
-
-        ship4: Ship = Ship(4, is_horizontal=True)
-        if field.place_ship(ship4, 0, 9):
-            ships.append(ship4)
-
-        ship3_1: Ship = Ship(3, is_horizontal=True)
-        if field.place_ship(ship3_1, 0, 0):
-            ships.append(ship3_1)
-
-        ship3_2: Ship = Ship(3, is_horizontal=True)
-        if field.place_ship(ship3_2, 4, 0):
-            ships.append(ship3_2)
-
-        ship2_1: Ship = Ship(2, is_horizontal=True)
-        if field.place_ship(ship2_1, 5, 9):
-            ships.append(ship2_1)
-
-        ship2_2: Ship = Ship(2, is_horizontal=True)
-        if field.place_ship(ship2_2, 8, 9):
-            ships.append(ship2_2)
-
-        ship2_3: Ship = Ship(2, is_horizontal=True)
-        if field.place_ship(ship2_3, 8, 0):
-            ships.append(ship2_3)
-
-        ships.extend(PlacementAlgorithms._place_remaining_ships(field, 1, 4))
-
-        return ships
-
-    @staticmethod
-    def _place_left_vertical_alt(field: GameField) -> List[Ship]:
-        """
-        Альтернативное размещение слева:
+        Расстановка 2:
         1010000000
         1010000000
         1010000000
@@ -239,129 +71,45 @@ class PlacementAlgorithms:
         1010000000
         1010000000
         """
-        ships: List[Ship] = []
+        # size, x, y, is_horizontal
+        base_ships1: list[tuple[int, int, int, bool]] = [
+            (4, 0, 0, False),
+            (3, 9, 0, False),
+            (3, 9, 4, False),
+            (2, 0, 5, False),
+            (2, 0, 8, False),
+            (2, 9, 8, False),
+        ]
+        base_ships2: list[tuple[int, int, int, bool]] = [
+            (4, 0, 0, False),
+            (3, 2, 0, False),
+            (3, 2, 4, False),
+            (2, 0, 5, False),
+            (2, 0, 8, False),
+            (2, 2, 8, False),
+        ]
+        base_ships = random.choice([base_ships1, base_ships2])
 
-        ship4: Ship = Ship(4, is_horizontal=False)
-        if field.place_ship(ship4, 0, 0):
-            ships.append(ship4)
+        for size, x, y, is_horizontal in base_ships:
+            if transpose:
+                x, y = y, x
+                is_horizontal = not is_horizontal
 
-        ship3_1: Ship = Ship(3, is_horizontal=False)
-        if field.place_ship(ship3_1, 2, 0):
-            ships.append(ship3_1)
+            if mirror:
+                if mirror_axis == "x":
+                    x = FIELD_SIZE - 1 - x
+                    if is_horizontal and size > 1:
+                        x = x - (size - 1)
+                else:
+                    y = FIELD_SIZE - 1 - y
+                    if not is_horizontal and size > 1:
+                        y = y - (size - 1)
 
-        ship3_2: Ship = Ship(3, is_horizontal=False)
-        if field.place_ship(ship3_2, 2, 4):
-            ships.append(ship3_2)
+            ship = Ship(size, is_horizontal=is_horizontal)
+            if not field.place_ship(ship, x, y):
+                continue
 
-        ship2_1: Ship = Ship(2, is_horizontal=False)
-        if field.place_ship(ship2_1, 0, 5):
-            ships.append(ship2_1)
-
-        ship2_2: Ship = Ship(2, is_horizontal=False)
-        if field.place_ship(ship2_2, 0, 8):
-            ships.append(ship2_2)
-
-        ship2_3: Ship = Ship(2, is_horizontal=False)
-        if field.place_ship(ship2_3, 2, 8):
-            ships.append(ship2_3)
-
-        ships.extend(PlacementAlgorithms._place_remaining_ships(field, 1, 4))
-
-        return ships
-
-    @staticmethod
-    def _place_right_vertical_alt(field: GameField) -> List[Ship]:
-        """Зеркальное отражение left_vertical_alt"""
-        ships: List[Ship] = []
-
-        ship4: Ship = Ship(4, is_horizontal=False)
-        if field.place_ship(ship4, 9, 0):
-            ships.append(ship4)
-
-        ship3_1: Ship = Ship(3, is_horizontal=False)
-        if field.place_ship(ship3_1, 7, 0):
-            ships.append(ship3_1)
-
-        ship3_2: Ship = Ship(3, is_horizontal=False)
-        if field.place_ship(ship3_2, 7, 4):
-            ships.append(ship3_2)
-
-        ship2_1: Ship = Ship(2, is_horizontal=False)
-        if field.place_ship(ship2_1, 9, 5):
-            ships.append(ship2_1)
-
-        ship2_2: Ship = Ship(2, is_horizontal=False)
-        if field.place_ship(ship2_2, 9, 8):
-            ships.append(ship2_2)
-
-        ship2_3: Ship = Ship(2, is_horizontal=False)
-        if field.place_ship(ship2_3, 7, 8):
-            ships.append(ship2_3)
-
-        ships.extend(PlacementAlgorithms._place_remaining_ships(field, 1, 4))
-
-        return ships
-
-    @staticmethod
-    def _place_top_horizontal_alt(field: GameField) -> List[Ship]:
-        """Транспонированная версия left_vertical_alt"""
-        ships: List[Ship] = []
-
-        ship4: Ship = Ship(4, is_horizontal=True)
-        if field.place_ship(ship4, 0, 0):
-            ships.append(ship4)
-
-        ship3_1: Ship = Ship(3, is_horizontal=True)
-        if field.place_ship(ship3_1, 0, 2):
-            ships.append(ship3_1)
-
-        ship3_2: Ship = Ship(3, is_horizontal=True)
-        if field.place_ship(ship3_2, 4, 2):
-            ships.append(ship3_2)
-
-        ship2_1: Ship = Ship(2, is_horizontal=True)
-        if field.place_ship(ship2_1, 5, 0):
-            ships.append(ship2_1)
-
-        ship2_2: Ship = Ship(2, is_horizontal=True)
-        if field.place_ship(ship2_2, 8, 0):
-            ships.append(ship2_2)
-
-        ship2_3: Ship = Ship(2, is_horizontal=True)
-        if field.place_ship(ship2_3, 8, 2):
-            ships.append(ship2_3)
-
-        ships.extend(PlacementAlgorithms._place_remaining_ships(field, 1, 4))
-
-        return ships
-
-    @staticmethod
-    def _place_bottom_horizontal_alt(field: GameField) -> List[Ship]:
-        ships: List[Ship] = []
-
-        ship4: Ship = Ship(4, is_horizontal=True)
-        if field.place_ship(ship4, 0, 9):
-            ships.append(ship4)
-
-        ship3_1: Ship = Ship(3, is_horizontal=True)
-        if field.place_ship(ship3_1, 0, 7):
-            ships.append(ship3_1)
-
-        ship3_2: Ship = Ship(3, is_horizontal=True)
-        if field.place_ship(ship3_2, 4, 7):
-            ships.append(ship3_2)
-
-        ship2_1: Ship = Ship(2, is_horizontal=True)
-        if field.place_ship(ship2_1, 5, 9):
-            ships.append(ship2_1)
-
-        ship2_2: Ship = Ship(2, is_horizontal=True)
-        if field.place_ship(ship2_2, 8, 9):
-            ships.append(ship2_2)
-
-        ship2_3: Ship = Ship(2, is_horizontal=True)
-        if field.place_ship(ship2_3, 8, 7):
-            ships.append(ship2_3)
+            ships.append(ship)
 
         ships.extend(PlacementAlgorithms._place_remaining_ships(field, 1, 4))
 
