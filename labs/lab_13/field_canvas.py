@@ -104,30 +104,32 @@ class FieldCanvas(tk.Canvas):
 
         for y in range(FIELD_SIZE):
             for x in range(FIELD_SIZE):
-                if field[y][x] == CellState.DESTROYED:
-                    for dx in range(-1, 2):
-                        for dy in range(-1, 2):
-                            nx, ny = x + dx, y + dy
-                            if not self.in_field(nx, ny):
-                                continue
+                if field[y][x] != CellState.DESTROYED:
+                    continue
 
-                            if field[ny][nx] != CellState.NO_SHIP:
-                                continue
+                for offset_x in range(-1, 2):
+                    for offset_y in range(-1, 2):
+                        next_x, next_y = x + offset_x, y + offset_y
+                        if not self.in_field(next_x, next_y):
+                            continue
 
-                            x1: int = nx * cell_size + 1
-                            y1: int = ny * cell_size + 1
-                            x2: int = x1 + cell_size - 2
-                            y2: int = y1 + cell_size - 2
+                        if field[next_y][next_x] != CellState.NO_SHIP:
+                            continue
 
-                            self.create_rectangle(
-                                x1,
-                                y1,
-                                x2,
-                                y2,
-                                fill=Colors.BLACK_MARK.value,
-                                outline=Colors.BLACK_MARK.value,
-                                tags="cell",
-                            )
+                        x1: int = next_x * cell_size + 1
+                        y1: int = next_y * cell_size + 1
+                        x2: int = x1 + cell_size - 2
+                        y2: int = y1 + cell_size - 2
+
+                        self.create_rectangle(
+                            x1,
+                            y1,
+                            x2,
+                            y2,
+                            fill=Colors.BLACK_MARK.value,
+                            outline=Colors.BLACK_MARK.value,
+                            tags="cell",
+                        )
 
     def draw_ship_preview(
         self, ship: Ship, x: Optional[int], y: Optional[int], valid: bool = True
@@ -145,12 +147,12 @@ class FieldCanvas(tk.Canvas):
         coords: List[Tuple[int, int]] = ship.get_coordinates()
         ship.x, ship.y = old_x, old_y
 
-        for cx, cy in coords:
-            if not self.in_field(cx, cy):
+        for cell_x, cell_y in coords:
+            if not self.in_field(cell_x, cell_y):
                 continue
 
-            x1: int = cx * cell_size + 1
-            y1: int = cy * cell_size + 1
+            x1: int = cell_x * cell_size + 1
+            y1: int = cell_y * cell_size + 1
             x2: int = x1 + cell_size - 2
             y2: int = y1 + cell_size - 2
 
