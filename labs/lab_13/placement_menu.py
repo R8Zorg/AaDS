@@ -265,7 +265,6 @@ class PlacementMenu(tk.Frame):
         rb_attack_algo2.pack(anchor=tk.W)
 
     def update_ships_list(self) -> None:
-        """Обновляет список кораблей для размещения"""
         self.ships_listbox.delete(0, tk.END)
 
         ships_count: Dict[int, int] = {1: 0, 2: 0, 3: 0, 4: 0}
