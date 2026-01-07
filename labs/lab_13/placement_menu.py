@@ -3,7 +3,7 @@ from enum import Enum
 from tkinter import ttk
 from typing import Callable, Dict, Optional, Tuple
 
-from config import AttackAlgorithm, Colors, PlacementAlgorithm
+from config import AttackAlgorithm, Colors, PlacementAlgorithm, SHIPS
 from game_logic import GameLogic
 from ship import Ship
 
@@ -274,7 +274,7 @@ class PlacementMenu(tk.Frame):
 
             ships_count[ship.size] += 1
 
-        for size in [4, 3, 2, 1]:
+        for size in SHIPS.keys():
             count: int = ships_count[size]
             if count <= 0:
                 continue
@@ -285,7 +285,7 @@ class PlacementMenu(tk.Frame):
         self._auto_select_ship()
 
     def _auto_select_ship(self) -> None:
-        for size in [4, 3, 2, 1]:
+        for size in SHIPS.keys():
             for ship in self.game_logic.player_ships_to_place:
                 if ship.size != size or ship.x is not None:
                     continue
